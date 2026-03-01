@@ -1,65 +1,1297 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from "react";
+
+const STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #F5F0E8;
+    --dark: #1A1A14;
+    --green: #2D5016;
+    --green-mid: #4A7C2F;
+    --green-light: #7FB069;
+    --terra: #C4622D;
+    --gold: #D4A843;
+    --warm-white: #FDFAF4;
+    --ink: #2C2C20;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); overflow-x: hidden; }
+
+  .page { min-height: 100vh; }
+
+  /* HOME */
+  .hero {
+    position: relative;
+    height: 100vh;
+    background: var(--dark);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(45,80,22,0.6) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(127,176,105,0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, rgba(196,98,45,0.2) 0%, transparent 40%);
+    z-index: 0;
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(127,176,105,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(127,176,105,0.08) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 0;
+  }
+
+  .nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 48px;
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900;
+    color: var(--cream);
+    letter-spacing: -0.5px;
+  }
+
+  .nav-logo span { color: var(--green-light); }
+
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    color: rgba(245,240,232,0.6);
+    text-decoration: none; font-size: 13px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    font-weight: 500;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav-links a:hover { color: var(--cream); }
+
+  .hero-content {
+    position: relative; z-index: 10;
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; padding: 0 48px;
+    max-width: 780px;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--green-light); font-weight: 500; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block; width: 32px; height: 1px; background: var(--green-light);
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 8vw, 96px);
+    font-weight: 900; line-height: 0.92;
+    color: var(--cream);
+    margin-bottom: 28px;
+  }
+
+  .hero-title em { font-style: italic; color: var(--green-light); }
+
+  .hero-sub {
+    font-size: 16px; line-height: 1.7;
+    color: rgba(245,240,232,0.65);
+    max-width: 480px; margin-bottom: 44px;
+    font-weight: 300;
+  }
+
+  .hero-cta {
+    display: flex; gap: 16px; align-items: center;
+  }
+
+  .btn-primary {
+    background: var(--green-light);
+    color: var(--dark); border: none;
+    padding: 16px 36px; font-size: 14px;
+    font-weight: 600; letter-spacing: 0.5px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--gold); transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent; border: 1px solid rgba(245,240,232,0.3);
+    color: rgba(245,240,232,0.7);
+    padding: 16px 28px; font-size: 14px;
+    font-weight: 400; letter-spacing: 0.5px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--cream); color: var(--cream); }
+
+  .hero-bottom {
+    position: relative; z-index: 10;
+    padding: 0 48px 36px;
+    display: flex; gap: 48px;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px; font-weight: 700;
+    color: var(--cream);
+  }
+  .stat-label {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: rgba(245,240,232,0.4); margin-top: 2px;
+  }
+
+  .hero-image-col {
+    position: absolute; right: 0; top: 0; bottom: 0;
+    width: 42%; z-index: 5;
+    display: flex; flex-direction: column;
+  }
+
+  .hero-img-panel {
+    flex: 1;
+    background: linear-gradient(135deg, #2D5016 0%, #4A7C2F 40%, #7FB069 100%);
+    position: relative; overflow: hidden;
+  }
+
+  .hero-img-panel::after {
+    content: '🌿';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 120px; opacity: 0.15;
+  }
+
+  .img-caption {
+    padding: 16px 24px;
+    background: var(--terra);
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--cream); font-weight: 500;
+  }
+
+  /* FEATURES STRIP */
+  .features-strip {
+    background: var(--warm-white);
+    padding: 80px 48px;
+    border-top: 1px solid rgba(45,80,22,0.1);
+  }
+
+  .section-label {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--green); margin-bottom: 48px;
+    font-weight: 600;
+  }
+
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: rgba(45,80,22,0.1);
+  }
+
+  .feature-card {
+    background: var(--warm-white);
+    padding: 40px 32px;
+    transition: background 0.2s;
+  }
+  .feature-card:hover { background: var(--cream); }
+
+  .feature-icon { font-size: 28px; margin-bottom: 20px; }
+  .feature-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700;
+    margin-bottom: 12px; color: var(--dark);
+  }
+  .feature-desc { font-size: 14px; line-height: 1.7; color: #666; font-weight: 300; }
+
+  /* WIZARD */
+  .wizard-page {
+    min-height: 100vh;
+    background: var(--cream);
+    display: flex;
+  }
+
+  .wizard-sidebar {
+    width: 340px; min-height: 100vh;
+    background: var(--dark);
+    padding: 48px 40px;
+    position: sticky; top: 0; height: 100vh;
+    display: flex; flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .wizard-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 900; color: var(--cream);
+    margin-bottom: 48px; cursor: pointer;
+  }
+  .wizard-logo span { color: var(--green-light); }
+
+  .wizard-steps { flex: 1; }
+  .wizard-step-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    opacity: 0.35;
+    transition: opacity 0.3s;
+  }
+  .wizard-step-item.active { opacity: 1; }
+  .wizard-step-item.done { opacity: 0.6; }
+
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 1px solid rgba(127,176,105,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--green-light); flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .wizard-step-item.active .step-num {
+    background: var(--green-light); color: var(--dark); border-color: var(--green-light);
+    font-weight: 700;
+  }
+  .wizard-step-item.done .step-num {
+    background: var(--green); color: var(--cream); border-color: var(--green);
+  }
+
+  .step-title { font-size: 13px; font-weight: 500; color: var(--cream); }
+  .step-subtitle { font-size: 11px; color: rgba(245,240,232,0.4); margin-top: 3px; }
+
+  .wizard-tip {
+    background: rgba(127,176,105,0.1);
+    border-left: 2px solid var(--green-light);
+    padding: 16px; font-size: 12px;
+    line-height: 1.6; color: rgba(245,240,232,0.6);
+    font-style: italic;
+  }
+
+  .wizard-main {
+    flex: 1; padding: 64px 72px;
+    max-width: 800px;
+  }
+
+  .wizard-progress {
+    height: 2px; background: rgba(45,80,22,0.1);
+    margin-bottom: 56px; position: relative;
+  }
+  .wizard-progress-fill {
+    height: 100%; background: var(--green-light);
+    transition: width 0.4s ease;
+  }
+
+  .wizard-step-label {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--green); margin-bottom: 16px; font-weight: 600;
+  }
+
+  .wizard-question {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700; line-height: 1.15;
+    color: var(--dark); margin-bottom: 12px;
+  }
+  .wizard-question em { font-style: italic; color: var(--green); }
+
+  .wizard-desc {
+    font-size: 15px; color: #888; font-weight: 300;
+    line-height: 1.6; margin-bottom: 44px;
+  }
+
+  /* OPTION CARDS */
+  .options-grid {
+    display: grid; gap: 12px;
+    margin-bottom: 44px;
+  }
+  .options-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .options-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .option-card {
+    border: 1.5px solid rgba(45,80,22,0.12);
+    padding: 20px 24px; cursor: pointer;
+    transition: all 0.2s;
+    background: var(--warm-white);
+    position: relative;
+  }
+  .option-card:hover { border-color: var(--green-light); background: white; }
+  .option-card.selected {
+    border-color: var(--green);
+    background: rgba(45,80,22,0.04);
+  }
+  .option-card.selected::after {
+    content: '✓';
+    position: absolute; top: 14px; right: 16px;
+    color: var(--green); font-size: 13px; font-weight: 700;
+  }
+
+  .option-icon { font-size: 22px; margin-bottom: 10px; }
+  .option-title { font-size: 15px; font-weight: 600; color: var(--dark); }
+  .option-sub { font-size: 12px; color: #888; margin-top: 4px; font-weight: 300; }
+
+  /* PLANT PICKER */
+  .plant-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin-bottom: 44px;
+  }
+
+  .plant-chip {
+    border: 1.5px solid rgba(45,80,22,0.12);
+    padding: 14px 12px; cursor: pointer;
+    text-align: center; background: var(--warm-white);
+    transition: all 0.2s;
+  }
+  .plant-chip:hover { border-color: var(--green-light); }
+  .plant-chip.selected { border-color: var(--green); background: rgba(45,80,22,0.05); }
+  .plant-chip .plant-emoji { font-size: 24px; display: block; margin-bottom: 6px; }
+  .plant-chip .plant-name { font-size: 11px; font-weight: 500; color: var(--dark); }
+  .plant-chip.selected .plant-name { color: var(--green); }
+
+  .wizard-nav {
+    display: flex; gap: 12px; align-items: center;
+  }
+
+  .btn-next {
+    background: var(--dark); color: var(--cream);
+    border: none; padding: 14px 36px;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.5px; transition: all 0.2s;
+  }
+  .btn-next:hover { background: var(--green); }
+  .btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-back {
+    background: transparent; border: 1.5px solid rgba(45,80,22,0.2);
+    color: #888; padding: 14px 24px; font-size: 14px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-back:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* RESULTS */
+  .results-page { min-height: 100vh; background: var(--cream); }
+
+  .results-hero {
+    background: var(--dark); padding: 48px;
+    position: relative; overflow: hidden;
+  }
+
+  .results-hero-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 70% 50%, rgba(45,80,22,0.5) 0%, transparent 70%);
+  }
+
+  .results-nav {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 48px;
+  }
+
+  .results-eyebrow {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--green-light); font-weight: 600; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .results-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--green-light); display: block; }
+
+  .results-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 900; color: var(--cream);
+    line-height: 1.05; margin-bottom: 20px;
+  }
+  .results-title em { color: var(--green-light); font-style: italic; }
+
+  .results-meta {
+    display: flex; gap: 24px; flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    background: rgba(127,176,105,0.15);
+    border: 1px solid rgba(127,176,105,0.3);
+    padding: 6px 14px; font-size: 12px;
+    color: var(--green-light); font-weight: 500;
+  }
+
+  .results-body { padding: 64px 48px; }
+
+  .overview-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: rgba(45,80,22,0.1);
+    margin-bottom: 64px;
+  }
+
+  .overview-card {
+    background: var(--warm-white);
+    padding: 28px 24px;
+  }
+
+  .overview-label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--green); margin-bottom: 8px; font-weight: 600;
+  }
+
+  .overview-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 700; color: var(--dark);
+    line-height: 1.3;
+  }
+
+  .section-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 700; color: var(--dark);
+  }
+
+  .section-count { font-size: 13px; color: #999; font-weight: 300; }
+
+  .plants-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 64px; }
+
+  .plant-row {
+    background: var(--warm-white);
+    border-left: 3px solid transparent;
+    transition: all 0.2s; overflow: hidden;
+  }
+
+  .plant-row.expanded { border-left-color: var(--green); }
+
+  .plant-row-header {
+    padding: 24px 28px; cursor: pointer;
+    display: flex; align-items: center; gap: 20px;
+    transition: background 0.2s;
+  }
+  .plant-row-header:hover { background: rgba(45,80,22,0.03); }
+
+  .plant-row-emoji { font-size: 28px; flex-shrink: 0; }
+
+  .plant-row-info { flex: 1; }
+  .plant-row-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700; color: var(--dark);
+  }
+  .plant-row-tagline { font-size: 12px; color: #999; margin-top: 3px; font-weight: 300; }
+
+  .plant-row-badges { display: flex; gap: 8px; margin-left: auto; flex-shrink: 0; }
+
+  .badge {
+    padding: 4px 10px; font-size: 10px;
+    letter-spacing: 1px; text-transform: uppercase; font-weight: 600;
+  }
+  .badge-easy { background: rgba(127,176,105,0.15); color: var(--green); }
+  .badge-moderate { background: rgba(212,168,67,0.15); color: #B8860B; }
+  .badge-sun { background: rgba(212,168,67,0.1); color: #C4862D; }
+  .badge-part { background: rgba(127,176,105,0.1); color: var(--green-mid); }
+
+  .plant-chevron {
+    font-size: 18px; color: #ccc;
+    transition: transform 0.3s; flex-shrink: 0;
+  }
+  .plant-row.expanded .plant-chevron { transform: rotate(180deg); color: var(--green); }
+
+  .plant-details {
+    padding: 0 28px 28px;
+    display: none;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .plant-row.expanded .plant-details { display: grid; }
+
+  .detail-block {
+    background: var(--cream);
+    padding: 20px 22px;
+  }
+
+  .detail-block.full-width { grid-column: 1 / -1; }
+
+  .detail-block-label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--green); font-weight: 600; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .detail-block-content {
+    font-size: 13px; line-height: 1.7; color: #555; font-weight: 300;
+  }
+
+  .detail-block-content ul { list-style: none; }
+  .detail-block-content ul li {
+    padding: 4px 0; display: flex; gap: 8px; align-items: flex-start;
+  }
+  .detail-block-content ul li::before { content: '→'; color: var(--green-light); flex-shrink: 0; }
+
+  .companions-section {
+    background: var(--dark); padding: 48px;
+    margin-bottom: 64px;
+  }
+
+  .companions-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; font-weight: 700; color: var(--cream);
+    margin-bottom: 8px;
+  }
+  .companions-sub { font-size: 13px; color: rgba(245,240,232,0.4); margin-bottom: 32px; font-weight: 300; }
+
+  .companions-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .companion-item {
+    background: rgba(127,176,105,0.12);
+    border: 1px solid rgba(127,176,105,0.2);
+    padding: 12px 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .companion-plants { font-size: 13px; font-weight: 500; color: var(--cream); }
+  .companion-note { font-size: 11px; color: rgba(245,240,232,0.5); margin-top: 2px; }
+
+  .soil-section {
+    background: var(--warm-white); padding: 48px;
+    margin-bottom: 64px; border-left: 3px solid var(--terra);
+  }
+
+  .start-over {
+    text-align: center; padding: 48px;
+    border-top: 1px solid rgba(45,80,22,0.1);
+  }
+
+  .start-over p { font-size: 14px; color: #999; margin-bottom: 20px; font-weight: 300; }
+
+  .ai-loading {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 400px; gap: 20px;
+  }
+
+  .ai-spinner {
+    width: 48px; height: 48px;
+    border: 2px solid rgba(45,80,22,0.1);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .ai-loading-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; color: var(--dark); font-style: italic;
+  }
+  .ai-loading-sub { font-size: 13px; color: #999; font-weight: 300; }
+
+  @media (max-width: 900px) {
+    .wizard-sidebar { display: none; }
+    .wizard-main { padding: 40px 32px; }
+    .plant-grid { grid-template-columns: repeat(3, 1fr); }
+    .options-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+    .overview-strip { grid-template-columns: repeat(2, 1fr); }
+    .hero-image-col { display: none; }
+    .nav { padding: 24px; }
+    .hero-content { padding: 0 24px; }
+    .hero-bottom { padding: 0 24px 32px; gap: 32px; }
+    .results-body, .results-hero, .companions-section, .soil-section { padding: 32px 24px; }
+    .features-strip { padding: 60px 24px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .plant-details { grid-template-columns: 1fr; }
+  }
+`;
+
+interface PlantData {
+  emoji: string;
+  name: string;
+  tagline: string;
+  difficulty: "easy" | "moderate";
+  sun: "full" | "part";
+  soil: string;
+  light: string;
+  water: string;
+  tips: string[];
+  companions: string[];
+  avoid: string[];
+}
+
+interface PlantItem {
+  id: string;
+  emoji: string;
+  name: string;
+}
+
+interface Answers {
+  space: string | null;
+  experience: string | null;
+  plants: string[];
+  goals: string[];
+}
+
+const PLANTS_DB: Record<string, PlantData> = {
+  basil: {
+    emoji: "🌿",
+    name: "Basil",
+    tagline: "The king of the herb garden",
+    difficulty: "easy",
+    sun: "full",
+    soil: "Well-draining, rich loam. pH 6.0–7.0. Slightly moist but never waterlogged.",
+    light: "6–8 hours of direct sun. South or west-facing balcony ideal. Will stretch and bolt in low light.",
+    water: "Consistently moist — water at the base when top inch of soil is dry. About every 1–2 days in summer.",
+    tips: [
+      "Pinch flower buds immediately to keep leaves coming",
+      "Never let it fully flower or it becomes bitter",
+      "Pot in terracotta — it breathes and prevents overwatering",
+      "Keep away from cold drafts and AC vents"
+    ],
+    companions: ["Peppers", "Tomatoes"],
+    avoid: ["Sage", "Rosemary"]
+  },
+  thyme: {
+    emoji: "🌱",
+    name: "Thyme",
+    tagline: "Mediterranean drought-tough beauty",
+    difficulty: "easy",
+    sun: "full",
+    soil: "Sandy, gritty, low-fertility. pH 6.0–8.0. Excellent drainage is critical — it despises wet roots.",
+    light: "Full sun, 6+ hours. One of the most sun-tolerant herbs — thrives on hot, south-facing spots.",
+    water: "Drought tolerant. Water deeply but infrequently — every 7–10 days. Let soil dry completely.",
+    tips: [
+      "Add grit or perlite to potting mix for drainage",
+      "Trim after flowering to keep plant bushy",
+      "Woody stems can be propagated easily by layering",
+      "Hardy to light frost — one of the last herbs standing in fall"
+    ],
+    companions: ["Rosemary", "Lavender", "Sage"],
+    avoid: ["Basil", "Mint"]
+  },
+  sage: {
+    emoji: "🌾",
+    name: "Sage",
+    tagline: "Silvery-leaved Mediterranean native",
+    difficulty: "easy",
+    sun: "full",
+    soil: "Well-draining, sandy or loamy. pH 6.0–7.0. Low to moderate fertility — too rich causes floppy growth.",
+    light: "Full sun, 6–8 hours minimum. Tolerates light afternoon shade in very hot climates.",
+    water: "Low water needs once established. Water every 7–10 days, allowing drying between waterings.",
+    tips: [
+      "Prune hard in spring to prevent woodiness",
+      "Excellent in terracotta or unglazed pots",
+      "Avoid high-nitrogen fertilizers — promotes leaf at expense of flavor",
+      "Flowers are edible and attract beneficial insects"
+    ],
+    companions: ["Rosemary", "Thyme", "Lavender"],
+    avoid: ["Basil", "Cucumbers"]
+  },
+  dill: {
+    emoji: "🌻",
+    name: "Dill",
+    tagline: "Feathery, fast-growing annual",
+    difficulty: "moderate",
+    sun: "full",
+    soil: "Rich, loose, well-draining. pH 5.8–6.5. Needs room to send deep taproot — use deep pots.",
+    light: "Full sun, 6–8 hours. Without enough light it goes leggy quickly.",
+    water: "Moderate — keep evenly moist but not wet. Water every 2–3 days in containers.",
+    tips: [
+      "Use containers at least 12\" deep for taproot",
+      "Succession sow every 3 weeks for continuous harvest",
+      "Bolt-resistant varieties like 'Fernleaf' work best in pots",
+      "Harvest before it flowers for best flavor"
+    ],
+    companions: ["Basil", "Peppers"],
+    avoid: ["Fennel", "Lavender", "Mint"]
+  },
+  mint: {
+    emoji: "🌿",
+    name: "Mint",
+    tagline: "Vigorous, aromatic — pot it alone",
+    difficulty: "easy",
+    sun: "part",
+    soil: "Rich, moist, well-draining. pH 6.0–7.0. Loves consistent moisture more than most herbs.",
+    light: "Partial sun — thrives with 3–6 hours. One of few herbs that tolerates shade well.",
+    water: "Keep consistently moist — water every 1–2 days. More forgiving of overwatering than most.",
+    tips: [
+      "ALWAYS grow in its own container — it will invade everything",
+      "Aggressive spreader — double-pot method contains roots",
+      "Trim regularly to prevent flowering and keep bushy",
+      "Spearmint, peppermint, and chocolate mint all work well in pots"
+    ],
+    companions: ["Standalone only"],
+    avoid: ["Everything — keep isolated to prevent takeover"]
+  },
+  lavender: {
+    emoji: "💜",
+    name: "Lavender",
+    tagline: "Drought-hardy, pollinator magnet",
+    difficulty: "moderate",
+    sun: "full",
+    soil: "Sandy, alkaline, extremely well-draining. pH 6.5–7.5. Add lime to raise pH if needed. Hates wet feet.",
+    light: "Full sun, 8+ hours. The more sun, the more fragrant and floriferous.",
+    water: "Very drought tolerant. Water deeply every 2 weeks once established. Root rot is the #1 killer.",
+    tips: [
+      "Use terracotta with drainage holes — glazed pots can cause waterlogging",
+      "Prune to one third after first bloom flush",
+      "English lavender (L. angustifolia) most compact for pots",
+      "Deadhead spent flowers to encourage reblooming"
+    ],
+    companions: ["Rosemary", "Thyme", "Sage"],
+    avoid: ["Mint", "Basil"]
+  },
+  rosemary: {
+    emoji: "🌿",
+    name: "Rosemary",
+    tagline: "Woody Mediterranean perennial",
+    difficulty: "easy",
+    sun: "full",
+    soil: "Sandy, gritty, alkaline. pH 6.0–8.0. Drainage is everything — mix in 30–40% perlite.",
+    light: "Full sun, 6–8 hours minimum. Leggy, sparse growth indicates insufficient light.",
+    water: "Allow soil to dry fully between waterings. Every 10–14 days in cool months, weekly in summer heat.",
+    tips: [
+      "Do not crowd — good air circulation prevents powdery mildew",
+      "Upright varieties grow tall; 'Prostrate' is trailing for balcony rails",
+      "Repot every 2–3 years as it becomes root bound",
+      "Bring indoors if temps drop below 20°F (−6°C)"
+    ],
+    companions: ["Lavender", "Thyme", "Sage"],
+    avoid: ["Mint", "Basil"]
+  },
+  peppers: {
+    emoji: "🌶️",
+    name: "Peppers",
+    tagline: "Heat-loving, sun-hungry, rewarding",
+    difficulty: "moderate",
+    sun: "full",
+    soil: "Rich, fertile, well-draining loam. pH 6.0–6.8. Mix in compost heavily. Needs more nutrients than herbs.",
+    light: "Full sun, 8+ hours. Critical for fruit set. Insufficient sun = lots of foliage, few peppers.",
+    water: "Consistent moisture — water every 2–3 days. Avoid drought stress during flowering or peppers drop.",
+    tips: [
+      "Use 5-gallon+ containers — bigger pot = bigger yield",
+      "Stake plants as they grow — stems are brittle in wind",
+      "Feed with low-nitrogen, high-phosphorus fertilizer once fruiting starts",
+      "Heat stress above 95°F causes blossom drop — provide afternoon shade"
+    ],
+    companions: ["Basil", "Dill"],
+    avoid: ["Fennel", "Mint"]
+  }
+};
+
+const WIZARD_STEPS = [
+  { id: "space", title: "Your Space", subtitle: "What are you working with?" },
+  { id: "experience", title: "Your Experience", subtitle: "How green is your thumb?" },
+  { id: "plants", title: "Plant Selection", subtitle: "What do you want to grow?" },
+  { id: "goals", title: "Your Goals", subtitle: "What matters most?" },
+];
+
+const SPACE_OPTIONS = [
+  { id: "balcony", icon: "🏙️", title: "Balcony / Patio", sub: "Container gardening, limited sq footage" },
+  { id: "raised", icon: "🪴", title: "Raised Beds", sub: "Dedicated beds, more control" },
+  { id: "small-yard", icon: "🌱", title: "Small Yard", sub: "Up to 1,000 sq ft of growing space" },
+  { id: "large-yard", icon: "🌳", title: "Large Yard / Plot", sub: "1/4 acre or more" },
+];
+
+const EXPERIENCE_OPTIONS = [
+  { id: "new", icon: "🌱", title: "Complete Beginner", sub: "Never grown anything" },
+  { id: "some", icon: "🌿", title: "Some Experience", sub: "A few seasons under my belt" },
+  { id: "confident", icon: "🌳", title: "Confident Gardener", sub: "Know my way around a garden" },
+];
+
+const GOAL_OPTIONS = [
+  { id: "eat", icon: "🍽️", title: "Grow food to eat", sub: null },
+  { id: "beauty", icon: "🌸", title: "Beautiful outdoor space", sub: null },
+  { id: "learn", icon: "📚", title: "Learn & experiment", sub: null },
+  { id: "wellness", icon: "🧘", title: "Therapeutic & mindful", sub: null },
+];
+
+const ALL_PLANTS: PlantItem[] = [
+  { id: "basil", emoji: "🌿", name: "Basil" },
+  { id: "thyme", emoji: "🌱", name: "Thyme" },
+  { id: "sage", emoji: "🌾", name: "Sage" },
+  { id: "dill", emoji: "🌻", name: "Dill" },
+  { id: "mint", emoji: "🍃", name: "Mint" },
+  { id: "lavender", emoji: "💜", name: "Lavender" },
+  { id: "rosemary", emoji: "🌿", name: "Rosemary" },
+  { id: "peppers", emoji: "🌶️", name: "Peppers" },
+  { id: "tomatoes", emoji: "🍅", name: "Tomatoes" },
+  { id: "lettuce", emoji: "🥬", name: "Lettuce" },
+  { id: "chives", emoji: "🌿", name: "Chives" },
+  { id: "parsley", emoji: "🌿", name: "Parsley" },
+  { id: "cucumber", emoji: "🥒", name: "Cucumber" },
+  { id: "strawberry", emoji: "🍓", name: "Strawberry" },
+  { id: "kale", emoji: "🥦", name: "Kale" },
+  { id: "zucchini", emoji: "🥗", name: "Zucchini" },
+];
+
+function getSpaceLabel(id: string | null): string {
+  return SPACE_OPTIONS.find(s => s.id === id)?.title ?? id ?? "";
+}
+
+function SunBadge({ type }: { type: string }) {
+  return type === "full"
+    ? <span className="badge badge-sun">☀ Full Sun</span>
+    : <span className="badge badge-part">⛅ Part Sun</span>;
+}
+
+function DiffBadge({ level }: { level: string }) {
+  return level === "easy"
+    ? <span className="badge badge-easy">Easy</span>
+    : <span className="badge badge-moderate">Moderate</span>;
+}
+
+function PlantRow({ plant }: { plant: PlantItem }) {
+  const [open, setOpen] = useState(false);
+  const data = PLANTS_DB[plant.id];
+  if (!data) return null;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className={`plant-row ${open ? "expanded" : ""}`}>
+      <div className="plant-row-header" onClick={() => setOpen(!open)}>
+        <span className="plant-row-emoji">{data.emoji}</span>
+        <div className="plant-row-info">
+          <div className="plant-row-name">{data.name}</div>
+          <div className="plant-row-tagline">{data.tagline}</div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="plant-row-badges">
+          <SunBadge type={data.sun} />
+          <DiffBadge level={data.difficulty} />
         </div>
-      </main>
+        <span className="plant-chevron">⌄</span>
+      </div>
+
+      <div className="plant-details">
+        <div className="detail-block">
+          <div className="detail-block-label">☀ Light Requirements</div>
+          <div className="detail-block-content">{data.light}</div>
+        </div>
+        <div className="detail-block">
+          <div className="detail-block-label">💧 Watering</div>
+          <div className="detail-block-content">{data.water}</div>
+        </div>
+        <div className="detail-block">
+          <div className="detail-block-label">🌍 Soil Composition</div>
+          <div className="detail-block-content">{data.soil}</div>
+        </div>
+        <div className="detail-block">
+          <div className="detail-block-label">🤝 Companion Plants</div>
+          <div className="detail-block-content">
+            <strong>Grows well with: </strong>{data.companions.join(", ")}<br />
+            <strong>Keep away from: </strong>{data.avoid.join(", ")}
+          </div>
+        </div>
+        <div className="detail-block full-width">
+          <div className="detail-block-label">💡 Pro Tips</div>
+          <div className="detail-block-content">
+            <ul>
+              {data.tips.map((t, i) => <li key={i}>{t}</li>)}
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function HomePage({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="page">
+      <div className="hero">
+        <div className="hero-bg" />
+        <div className="hero-grid" />
+        <nav className="nav">
+          <div className="nav-logo">Terra<span>.</span></div>
+          <div className="nav-links">
+            <a>Guides</a>
+            <a>Community</a>
+            <a onClick={onStart}>Plan My Garden</a>
+          </div>
+        </nav>
+        <div className="hero-content">
+          <div className="hero-eyebrow">The Garden Planning Tool</div>
+          <h1 className="hero-title">
+            Grow <em>anything.</em><br />
+            Anywhere.
+          </h1>
+          <p className="hero-sub">
+            From a single herb pot on your balcony to a quarter-acre backyard — personalized guidance for every gardener, every space.
+          </p>
+          <div className="hero-cta">
+            <button className="btn-primary" onClick={onStart}>Plan My Garden →</button>
+            <button className="btn-ghost">See How It Works</button>
+          </div>
+        </div>
+        <div className="hero-bottom">
+          <div className="stat">
+            <div className="stat-num">200+</div>
+            <div className="stat-label">Plant Profiles</div>
+          </div>
+          <div className="stat">
+            <div className="stat-num">12</div>
+            <div className="stat-label">Climate Zones</div>
+          </div>
+          <div className="stat">
+            <div className="stat-num">Any</div>
+            <div className="stat-label">Space Size</div>
+          </div>
+        </div>
+        <div className="hero-image-col">
+          <div className="hero-img-panel" />
+          <div className="img-caption">Balcony Herb Collection — Summer Edition</div>
+        </div>
+      </div>
+
+      <div className="features-strip">
+        <div className="section-label">Why Terra</div>
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">🧭</div>
+            <div className="feature-title">Guided Planning</div>
+            <div className="feature-desc">Answer a few questions about your space, experience, and goals. We&apos;ll build a personalized garden plan around you.</div>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🌱</div>
+            <div className="feature-title">Deep Plant Knowledge</div>
+            <div className="feature-desc">Light, water, soil composition, companion planting, seasonal tips — every detail you need, curated for real gardeners.</div>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🏙️</div>
+            <div className="feature-title">Any Space Works</div>
+            <div className="feature-desc">Balcony with 4 pots or a half-acre backyard. Container gardening to in-ground beds. We cover it all, at every level.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WizardPage({ onComplete, onBack }: { onComplete: (answers: Answers) => void; onBack: () => void }) {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<Answers>({ space: null, experience: null, plants: [], goals: [] });
+
+  function canProceed() {
+    if (step === 0) return !!answers.space;
+    if (step === 1) return !!answers.experience;
+    if (step === 2) return answers.plants.length > 0;
+    if (step === 3) return answers.goals.length > 0;
+    return false;
+  }
+
+  function next() {
+    if (step < WIZARD_STEPS.length - 1) setStep(step + 1);
+    else onComplete(answers);
+  }
+
+  function togglePlant(id: string) {
+    setAnswers(a => ({
+      ...a,
+      plants: a.plants.includes(id) ? a.plants.filter(p => p !== id) : [...a.plants, id]
+    }));
+  }
+
+  function toggleGoal(id: string) {
+    setAnswers(a => ({
+      ...a,
+      goals: a.goals.includes(id) ? a.goals.filter(g => g !== id) : [...a.goals, id]
+    }));
+  }
+
+  const progress = (step / WIZARD_STEPS.length) * 100;
+
+  const tips = [
+    "Balcony gardens shine with container-friendly herbs like basil, mint, and thyme.",
+    "Even a few hours of sun on a north-facing balcony can support lettuce and herbs.",
+    "Mix plants thoughtfully — companion planting reduces pests naturally.",
+    "Most herb gardens can sustain a household from just 4–6 plants."
+  ];
+
+  return (
+    <div className="wizard-page">
+      <div className="wizard-sidebar">
+        <div className="wizard-logo" onClick={onBack}>Terra<span>.</span></div>
+        <div className="wizard-steps">
+          {WIZARD_STEPS.map((s, i) => (
+            <div key={s.id} className={`wizard-step-item ${i === step ? "active" : ""} ${i < step ? "done" : ""}`}>
+              <div className="step-num">{i < step ? "✓" : i + 1}</div>
+              <div className="step-info">
+                <div className="step-title">{s.title}</div>
+                <div className="step-subtitle">{s.subtitle}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="wizard-tip">{tips[step]}</div>
+      </div>
+
+      <div className="wizard-main">
+        <div className="wizard-progress">
+          <div className="wizard-progress-fill" style={{ width: `${progress}%` }} />
+        </div>
+
+        {step === 0 && (
+          <>
+            <div className="wizard-step-label">Step 1 of 4</div>
+            <h2 className="wizard-question">What kind of <em>space</em> are you working with?</h2>
+            <p className="wizard-desc">This shapes everything — container sizes, plant density, watering frequency, and more.</p>
+            <div className="options-grid cols-2">
+              {SPACE_OPTIONS.map(opt => (
+                <div key={opt.id} className={`option-card ${answers.space === opt.id ? "selected" : ""}`}
+                  onClick={() => setAnswers(a => ({ ...a, space: opt.id }))}>
+                  <div className="option-icon">{opt.icon}</div>
+                  <div className="option-title">{opt.title}</div>
+                  <div className="option-sub">{opt.sub}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 1 && (
+          <>
+            <div className="wizard-step-label">Step 2 of 4</div>
+            <h2 className="wizard-question">How would you describe your <em>experience</em>?</h2>
+            <p className="wizard-desc">No judgment — we tailor the advice to where you&apos;re at right now.</p>
+            <div className="options-grid cols-3">
+              {EXPERIENCE_OPTIONS.map(opt => (
+                <div key={opt.id} className={`option-card ${answers.experience === opt.id ? "selected" : ""}`}
+                  onClick={() => setAnswers(a => ({ ...a, experience: opt.id }))}>
+                  <div className="option-icon">{opt.icon}</div>
+                  <div className="option-title">{opt.title}</div>
+                  <div className="option-sub">{opt.sub}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <div className="wizard-step-label">Step 3 of 4</div>
+            <h2 className="wizard-question">What do you want to <em>grow?</em></h2>
+            <p className="wizard-desc">Pick everything you&apos;re interested in — we&apos;ll check compatibility and give tips for each.</p>
+            <div className="plant-grid">
+              {ALL_PLANTS.map(p => (
+                <div key={p.id} className={`plant-chip ${answers.plants.includes(p.id) ? "selected" : ""}`}
+                  onClick={() => togglePlant(p.id)}>
+                  <span className="plant-emoji">{p.emoji}</span>
+                  <span className="plant-name">{p.name}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 3 && (
+          <>
+            <div className="wizard-step-label">Step 4 of 4</div>
+            <h2 className="wizard-question">What are your <em>goals?</em></h2>
+            <p className="wizard-desc">Select all that apply — this helps us prioritize what matters to you.</p>
+            <div className="options-grid cols-2">
+              {GOAL_OPTIONS.map(opt => (
+                <div key={opt.id} className={`option-card ${answers.goals.includes(opt.id) ? "selected" : ""}`}
+                  onClick={() => toggleGoal(opt.id)}>
+                  <div className="option-icon">{opt.icon}</div>
+                  <div className="option-title">{opt.title}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        <div className="wizard-nav">
+          {step > 0 && <button className="btn-back" onClick={() => setStep(step - 1)}>← Back</button>}
+          <button className="btn-next" onClick={next} disabled={!canProceed()}>
+            {step === WIZARD_STEPS.length - 1 ? "Generate My Garden Guide →" : "Continue →"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () => void }) {
+  const [loading, setLoading] = useState(true);
+  const [aiInsight, setAiInsight] = useState("");
+
+  const selectedPlants = ALL_PLANTS.filter(p => answers.plants.includes(p.id));
+  const knownPlants = selectedPlants.filter(p => PLANTS_DB[p.id]);
+  const sunNeeds = knownPlants.filter(p => PLANTS_DB[p.id]?.sun === "full").map(p => p.name);
+  const shadeOk = knownPlants.filter(p => PLANTS_DB[p.id]?.sun === "part").map(p => p.name);
+
+  const companionPairs: { key: string; plants: string[]; note: string }[] = [];
+  knownPlants.forEach(p => {
+    const data = PLANTS_DB[p.id];
+    data.companions.forEach(c => {
+      const match = knownPlants.find(kp => kp.name === c);
+      if (match) {
+        const key = [p.name, match.name].sort().join("-");
+        if (!companionPairs.find(cp => cp.key === key)) {
+          companionPairs.push({ key, plants: [p.name, match.name], note: "Great pairing — grow together" });
+        }
+      }
+    });
+  });
+
+  useEffect(() => {
+    const fetchInsight = async () => {
+      try {
+        const plantNames = selectedPlants.map(p => p.name).join(", ");
+        const experienceLabel = answers.experience === "new" ? "beginner" : answers.experience === "some" ? "intermediate" : "experienced";
+        const spaceLabel = getSpaceLabel(answers.space).toLowerCase();
+        const prompt = `A ${experienceLabel} gardener with a ${spaceLabel} wants to grow: ${plantNames}. Write a 2-3 sentence personalized garden insight — enthusiastic, specific, actionable. Mention 1-2 of their specific plants. No markdown, no bullet points, pure prose. Keep it warm and encouraging.`;
+
+        const response = await fetch("/api/garden-insight", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+        const data = await response.json();
+        setAiInsight(data.text ?? "");
+      } catch {
+        setAiInsight("Your plant selection is wonderfully curated for your space. The combination of sun-loving herbs and peppers will thrive together — just watch your mint, it loves to take over!");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInsight();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="results-page">
+        <div className="ai-loading">
+          <div className="ai-spinner" />
+          <div className="ai-loading-text">Building your garden guide…</div>
+          <div className="ai-loading-sub">Analyzing {selectedPlants.length} plants for {getSpaceLabel(answers.space).toLowerCase()}</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="results-page">
+      <div className="results-hero">
+        <div className="results-hero-bg" />
+        <div className="results-nav">
+          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 900, color: "var(--cream)", cursor: "pointer" }} onClick={onRestart}>
+            Terra<span style={{ color: "var(--green-light)" }}>.</span>
+          </div>
+          <button className="btn-ghost" onClick={onRestart} style={{ fontSize: 12 }}>← Start Over</button>
+        </div>
+        <div className="results-summary">
+          <div className="results-eyebrow">Your Personal Garden Guide</div>
+          <h1 className="results-title">
+            <em>{selectedPlants.length} plants</em> for your<br />
+            {getSpaceLabel(answers.space)}
+          </h1>
+          <div className="results-meta">
+            <span className="meta-pill">🏡 {getSpaceLabel(answers.space)}</span>
+            <span className="meta-pill">🌱 {answers.experience === "new" ? "Beginner" : answers.experience === "some" ? "Intermediate" : "Experienced"}</span>
+            {answers.goals.map(g => {
+              const gl = GOAL_OPTIONS.find(o => o.id === g);
+              return gl ? <span key={g} className="meta-pill">{gl.icon} {gl.title}</span> : null;
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="results-body">
+        {aiInsight && (
+          <div style={{
+            background: "rgba(45,80,22,0.06)", borderLeft: "3px solid var(--green-light)",
+            padding: "24px 28px", marginBottom: 48,
+            fontFamily: "'Playfair Display', serif", fontSize: 18,
+            fontStyle: "italic", color: "var(--dark)", lineHeight: 1.7
+          }}>
+            ✦ {aiInsight}
+          </div>
+        )}
+
+        <div className="overview-strip">
+          <div className="overview-card">
+            <div className="overview-label">Full Sun Plants</div>
+            <div className="overview-value">{sunNeeds.join(", ") || "—"}</div>
+          </div>
+          <div className="overview-card">
+            <div className="overview-label">Partial Sun OK</div>
+            <div className="overview-value">{shadeOk.join(", ") || "—"}</div>
+          </div>
+          <div className="overview-card">
+            <div className="overview-label">Companion Pairs</div>
+            <div className="overview-value">{companionPairs.length} found in your selection</div>
+          </div>
+          <div className="overview-card">
+            <div className="overview-label">Difficulty Range</div>
+            <div className="overview-value">{knownPlants.some(p => PLANTS_DB[p.id]?.difficulty === "moderate") ? "Easy to Moderate" : "All Easy"}</div>
+          </div>
+        </div>
+
+        <div className="section-header">
+          <div className="section-title">Plant-by-Plant Guide</div>
+          <div className="section-count">{knownPlants.length} plants — click to expand</div>
+        </div>
+        <div className="plants-list">
+          {knownPlants.map(p => <PlantRow key={p.id} plant={p} />)}
+        </div>
+
+        {companionPairs.length > 0 && (
+          <div className="companions-section">
+            <div className="companions-title">Companion Planting Map</div>
+            <div className="companions-sub">Based on your specific plant selection — place these near each other</div>
+            <div className="companions-grid">
+              {companionPairs.map(cp => (
+                <div key={cp.key} className="companion-item">
+                  <div>
+                    <div className="companion-plants">{cp.plants[0]} + {cp.plants[1]}</div>
+                    <div className="companion-note">{cp.note}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="soil-section">
+          <div className="section-title" style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, marginBottom: 8 }}>Universal Soil Baseline</div>
+          <p style={{ color: "#999", fontSize: 13, marginBottom: 20, fontWeight: 300 }}>For your {getSpaceLabel(answers.space).toLowerCase()} — adjust per plant guide above</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            {[
+              { label: "Base Mix", value: "60% quality potting mix, 30% perlite for drainage, 10% compost for nutrients" },
+              { label: "pH Range", value: "6.0–7.0 covers most herbs and peppers. Lavender prefers slightly more alkaline (6.5–7.5)" },
+              { label: "Fertilizing", value: "Slow-release granules at planting. Liquid feed every 2–3 weeks through the growing season." },
+              { label: "Container Tip", value: "Terracotta over plastic — breathes better. Size up for peppers (5gal+). Mint gets its own pot, always." }
+            ].map(item => (
+              <div key={item.label} style={{ padding: "16px 0", borderBottom: "1px solid rgba(45,80,22,0.1)" }}>
+                <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--green)", fontWeight: 600, marginBottom: 6 }}>{item.label}</div>
+                <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, fontWeight: 300 }}>{item.value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="start-over">
+          <p>Want to plan a different garden or try new plants?</p>
+          <button className="btn-next" onClick={onRestart}>Plan Another Garden →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [view, setView] = useState("home");
+  const [answers, setAnswers] = useState<Answers | null>(null);
+
+  return (
+    <>
+      <style>{STYLES}</style>
+      {view === "home" && <HomePage onStart={() => setView("wizard")} />}
+      {view === "wizard" && (
+        <WizardPage
+          onComplete={a => { setAnswers(a); setView("results"); }}
+          onBack={() => setView("home")}
+        />
+      )}
+      {view === "results" && answers && (
+        <ResultsPage answers={answers} onRestart={() => { setAnswers(null); setView("home"); }} />
+      )}
+    </>
   );
 }
