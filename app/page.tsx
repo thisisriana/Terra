@@ -242,6 +242,7 @@ interface PlantDetail {
   soil_description: string;
   ph_min: number;
   ph_max: number;
+  drainage: string;
   plant_tips: TipEntry[];
   companion_planting: CompanionEntry[];
 }
@@ -754,18 +755,27 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
         )}
 
         <div className="soil-section">
-          <div className="section-title" style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, marginBottom: 8 }}>Universal Soil Baseline</div>
-          <p style={{ color: "#999", fontSize: 13, marginBottom: 20, fontWeight: 300 }}>For your {getSpaceLabel(answers.space).toLowerCase()} — adjust per plant guide above</p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            {[
-              { label: "Base Mix",       value: "60% quality potting mix, 30% perlite for drainage, 10% compost for nutrients" },
-              { label: "pH Range",       value: "6.0–7.0 covers most herbs and peppers. Lavender prefers slightly more alkaline (6.5–7.5)" },
-              { label: "Fertilizing",   value: "Slow-release granules at planting. Liquid feed every 2–3 weeks through the growing season." },
-              { label: "Container Tip", value: "Terracotta over plastic — breathes better. Size up for peppers (5gal+). Mint gets its own pot, always." },
-            ].map(item => (
-              <div key={item.label} style={{ padding: "16px 0", borderBottom: "1px solid rgba(45,80,22,0.1)" }}>
-                <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--green)", fontWeight: 600, marginBottom: 6 }}>{item.label}</div>
-                <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, fontWeight: 300 }}>{item.value}</div>
+          <div className="section-title" style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, marginBottom: 8 }}>Soil Guide</div>
+          <p style={{ color: "#999", fontSize: 13, marginBottom: 32, fontWeight: 300 }}>Specific soil and pH requirements for each plant in your selection</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {plantDetails.map(plant => (
+              <div key={plant.slug} style={{ background: "var(--cream)", padding: "24px 28px", display: "grid", gridTemplateColumns: "200px 1fr 120px 120px", gap: 24, alignItems: "start" }}>
+                <div>
+                  <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--green)", fontWeight: 600, marginBottom: 6 }}>Plant</div>
+                  <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, fontWeight: 700, color: "var(--dark)" }}>{plant.emoji} {plant.name}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--green)", fontWeight: 600, marginBottom: 6 }}>Soil Composition</div>
+                  <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, fontWeight: 300 }}>{plant.soil_description}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--green)", fontWeight: 600, marginBottom: 6 }}>pH Range</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: "var(--dark)" }}>{plant.ph_min}–{plant.ph_max}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--green)", fontWeight: 600, marginBottom: 6 }}>Drainage</div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)", textTransform: "capitalize" }}>{plant.drainage}</div>
+                </div>
               </div>
             ))}
           </div>
