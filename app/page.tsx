@@ -23,16 +23,10 @@ const STYLES = `
 
   .page { min-height: 100vh; }
 
-  /* HOME */
   .hero {
-    position: relative;
-    height: 100vh;
-    background: var(--dark);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    position: relative; height: 100vh; background: var(--dark);
+    overflow: hidden; display: flex; flex-direction: column;
   }
-
   .hero-bg {
     position: absolute; inset: 0;
     background:
@@ -41,546 +35,161 @@ const STYLES = `
       radial-gradient(ellipse at 60% 80%, rgba(196,98,45,0.2) 0%, transparent 40%);
     z-index: 0;
   }
-
   .hero-grid {
     position: absolute; inset: 0;
     background-image:
       linear-gradient(rgba(127,176,105,0.08) 1px, transparent 1px),
       linear-gradient(90deg, rgba(127,176,105,0.08) 1px, transparent 1px);
-    background-size: 60px 60px;
-    z-index: 0;
+    background-size: 60px 60px; z-index: 0;
   }
-
   .nav {
     position: relative; z-index: 10;
     display: flex; align-items: center; justify-content: space-between;
     padding: 28px 48px;
   }
-
-  .nav-logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px; font-weight: 900;
-    color: var(--cream);
-    letter-spacing: -0.5px;
-  }
-
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: var(--cream); letter-spacing: -0.5px; }
   .nav-logo span { color: var(--green-light); }
-
   .nav-links { display: flex; gap: 32px; }
-  .nav-links a {
-    color: rgba(245,240,232,0.6);
-    text-decoration: none; font-size: 13px;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    font-weight: 500;
-    transition: color 0.2s;
-    cursor: pointer;
-  }
+  .nav-links a { color: rgba(245,240,232,0.6); text-decoration: none; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; transition: color 0.2s; cursor: pointer; }
   .nav-links a:hover { color: var(--cream); }
-
-  .hero-content {
-    position: relative; z-index: 10;
-    flex: 1; display: flex; flex-direction: column;
-    justify-content: center; padding: 0 48px;
-    max-width: 780px;
-  }
-
-  .hero-eyebrow {
-    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--green-light); font-weight: 500; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .hero-eyebrow::before {
-    content: ''; display: block; width: 32px; height: 1px; background: var(--green-light);
-  }
-
-  .hero-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(52px, 8vw, 96px);
-    font-weight: 900; line-height: 0.92;
-    color: var(--cream);
-    margin-bottom: 28px;
-  }
-
+  .hero-content { position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 48px; max-width: 780px; }
+  .hero-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--green-light); font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+  .hero-eyebrow::before { content: ''; display: block; width: 32px; height: 1px; background: var(--green-light); }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(52px, 8vw, 96px); font-weight: 900; line-height: 0.92; color: var(--cream); margin-bottom: 28px; }
   .hero-title em { font-style: italic; color: var(--green-light); }
-
-  .hero-sub {
-    font-size: 16px; line-height: 1.7;
-    color: rgba(245,240,232,0.65);
-    max-width: 480px; margin-bottom: 44px;
-    font-weight: 300;
-  }
-
-  .hero-cta {
-    display: flex; gap: 16px; align-items: center;
-  }
-
-  .btn-primary {
-    background: var(--green-light);
-    color: var(--dark); border: none;
-    padding: 16px 36px; font-size: 14px;
-    font-weight: 600; letter-spacing: 0.5px;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
-  }
+  .hero-sub { font-size: 16px; line-height: 1.7; color: rgba(245,240,232,0.65); max-width: 480px; margin-bottom: 44px; font-weight: 300; }
+  .hero-cta { display: flex; gap: 16px; align-items: center; }
+  .btn-primary { background: var(--green-light); color: var(--dark); border: none; padding: 16px 36px; font-size: 14px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
   .btn-primary:hover { background: var(--gold); transform: translateY(-1px); }
-
-  .btn-ghost {
-    background: transparent; border: 1px solid rgba(245,240,232,0.3);
-    color: rgba(245,240,232,0.7);
-    padding: 16px 28px; font-size: 14px;
-    font-weight: 400; letter-spacing: 0.5px;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
-  }
+  .btn-ghost { background: transparent; border: 1px solid rgba(245,240,232,0.3); color: rgba(245,240,232,0.7); padding: 16px 28px; font-size: 14px; font-weight: 400; letter-spacing: 0.5px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
   .btn-ghost:hover { border-color: var(--cream); color: var(--cream); }
+  .hero-bottom { position: relative; z-index: 10; padding: 0 48px 36px; display: flex; gap: 48px; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--cream); }
+  .stat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(245,240,232,0.4); margin-top: 2px; }
+  .hero-image-col { position: absolute; right: 0; top: 0; bottom: 0; width: 42%; z-index: 5; display: flex; flex-direction: column; }
+  .hero-img-panel { flex: 1; background: linear-gradient(135deg, #2D5016 0%, #4A7C2F 40%, #7FB069 100%); position: relative; overflow: hidden; }
+  .hero-img-panel::after { content: '🌿'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 120px; opacity: 0.15; }
+  .img-caption { padding: 16px 24px; background: var(--terra); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--cream); font-weight: 500; }
 
-  .hero-bottom {
-    position: relative; z-index: 10;
-    padding: 0 48px 36px;
-    display: flex; gap: 48px;
-  }
-
-  .stat-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 32px; font-weight: 700;
-    color: var(--cream);
-  }
-  .stat-label {
-    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
-    color: rgba(245,240,232,0.4); margin-top: 2px;
-  }
-
-  .hero-image-col {
-    position: absolute; right: 0; top: 0; bottom: 0;
-    width: 42%; z-index: 5;
-    display: flex; flex-direction: column;
-  }
-
-  .hero-img-panel {
-    flex: 1;
-    background: linear-gradient(135deg, #2D5016 0%, #4A7C2F 40%, #7FB069 100%);
-    position: relative; overflow: hidden;
-  }
-
-  .hero-img-panel::after {
-    content: '🌿';
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 120px; opacity: 0.15;
-  }
-
-  .img-caption {
-    padding: 16px 24px;
-    background: var(--terra);
-    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--cream); font-weight: 500;
-  }
-
-  /* FEATURES STRIP */
-  .features-strip {
-    background: var(--warm-white);
-    padding: 80px 48px;
-    border-top: 1px solid rgba(45,80,22,0.1);
-  }
-
-  .section-label {
-    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--green); margin-bottom: 48px;
-    font-weight: 600;
-  }
-
-  .features-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 1px; background: rgba(45,80,22,0.1);
-  }
-
-  .feature-card {
-    background: var(--warm-white);
-    padding: 40px 32px;
-    transition: background 0.2s;
-  }
+  .features-strip { background: var(--warm-white); padding: 80px 48px; border-top: 1px solid rgba(45,80,22,0.1); }
+  .section-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); margin-bottom: 48px; font-weight: 600; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(45,80,22,0.1); }
+  .feature-card { background: var(--warm-white); padding: 40px 32px; transition: background 0.2s; }
   .feature-card:hover { background: var(--cream); }
-
   .feature-icon { font-size: 28px; margin-bottom: 20px; }
-  .feature-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px; font-weight: 700;
-    margin-bottom: 12px; color: var(--dark);
-  }
+  .feature-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 12px; color: var(--dark); }
   .feature-desc { font-size: 14px; line-height: 1.7; color: #666; font-weight: 300; }
 
-  /* WIZARD */
-  .wizard-page {
-    min-height: 100vh;
-    background: var(--cream);
-    display: flex;
-  }
-
-  .wizard-sidebar {
-    width: 340px; min-height: 100vh;
-    background: var(--dark);
-    padding: 48px 40px;
-    position: sticky; top: 0; height: 100vh;
-    display: flex; flex-direction: column;
-    flex-shrink: 0;
-  }
-
-  .wizard-logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px; font-weight: 900; color: var(--cream);
-    margin-bottom: 48px; cursor: pointer;
-  }
+  .wizard-page { min-height: 100vh; background: var(--cream); display: flex; }
+  .wizard-sidebar { width: 340px; min-height: 100vh; background: var(--dark); padding: 48px 40px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; flex-shrink: 0; }
+  .wizard-logo { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900; color: var(--cream); margin-bottom: 48px; cursor: pointer; }
   .wizard-logo span { color: var(--green-light); }
-
   .wizard-steps { flex: 1; }
-  .wizard-step-item {
-    display: flex; gap: 16px; align-items: flex-start;
-    padding: 16px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    opacity: 0.35;
-    transition: opacity 0.3s;
-  }
+  .wizard-step-item { display: flex; gap: 16px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); opacity: 0.35; transition: opacity 0.3s; }
   .wizard-step-item.active { opacity: 1; }
   .wizard-step-item.done { opacity: 0.6; }
-
-  .step-num {
-    width: 24px; height: 24px; border-radius: 50%;
-    border: 1px solid rgba(127,176,105,0.4);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; color: var(--green-light); flex-shrink: 0;
-    margin-top: 2px;
-  }
-  .wizard-step-item.active .step-num {
-    background: var(--green-light); color: var(--dark); border-color: var(--green-light);
-    font-weight: 700;
-  }
-  .wizard-step-item.done .step-num {
-    background: var(--green); color: var(--cream); border-color: var(--green);
-  }
-
+  .step-num { width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(127,176,105,0.4); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--green-light); flex-shrink: 0; margin-top: 2px; }
+  .wizard-step-item.active .step-num { background: var(--green-light); color: var(--dark); border-color: var(--green-light); font-weight: 700; }
+  .wizard-step-item.done .step-num { background: var(--green); color: var(--cream); border-color: var(--green); }
   .step-title { font-size: 13px; font-weight: 500; color: var(--cream); }
   .step-subtitle { font-size: 11px; color: rgba(245,240,232,0.4); margin-top: 3px; }
-
-  .wizard-tip {
-    background: rgba(127,176,105,0.1);
-    border-left: 2px solid var(--green-light);
-    padding: 16px; font-size: 12px;
-    line-height: 1.6; color: rgba(245,240,232,0.6);
-    font-style: italic;
-  }
-
-  .wizard-main {
-    flex: 1; padding: 64px 72px;
-    max-width: 800px;
-  }
-
-  .wizard-progress {
-    height: 2px; background: rgba(45,80,22,0.1);
-    margin-bottom: 56px; position: relative;
-  }
-  .wizard-progress-fill {
-    height: 100%; background: var(--green-light);
-    transition: width 0.4s ease;
-  }
-
-  .wizard-step-label {
-    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--green); margin-bottom: 16px; font-weight: 600;
-  }
-
-  .wizard-question {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(28px, 4vw, 42px);
-    font-weight: 700; line-height: 1.15;
-    color: var(--dark); margin-bottom: 12px;
-  }
+  .wizard-tip { background: rgba(127,176,105,0.1); border-left: 2px solid var(--green-light); padding: 16px; font-size: 12px; line-height: 1.6; color: rgba(245,240,232,0.6); font-style: italic; }
+  .wizard-main { flex: 1; padding: 64px 72px; max-width: 800px; }
+  .wizard-progress { height: 2px; background: rgba(45,80,22,0.1); margin-bottom: 56px; position: relative; }
+  .wizard-progress-fill { height: 100%; background: var(--green-light); transition: width 0.4s ease; }
+  .wizard-step-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); margin-bottom: 16px; font-weight: 600; }
+  .wizard-question { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 42px); font-weight: 700; line-height: 1.15; color: var(--dark); margin-bottom: 12px; }
   .wizard-question em { font-style: italic; color: var(--green); }
+  .wizard-desc { font-size: 15px; color: #888; font-weight: 300; line-height: 1.6; margin-bottom: 44px; }
 
-  .wizard-desc {
-    font-size: 15px; color: #888; font-weight: 300;
-    line-height: 1.6; margin-bottom: 44px;
-  }
-
-  /* OPTION CARDS */
-  .options-grid {
-    display: grid; gap: 12px;
-    margin-bottom: 44px;
-  }
+  .options-grid { display: grid; gap: 12px; margin-bottom: 44px; }
   .options-grid.cols-2 { grid-template-columns: 1fr 1fr; }
   .options-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-
-  .option-card {
-    border: 1.5px solid rgba(45,80,22,0.12);
-    padding: 20px 24px; cursor: pointer;
-    transition: all 0.2s;
-    background: var(--warm-white);
-    position: relative;
-  }
+  .option-card { border: 1.5px solid rgba(45,80,22,0.12); padding: 20px 24px; cursor: pointer; transition: all 0.2s; background: var(--warm-white); position: relative; }
   .option-card:hover { border-color: var(--green-light); background: white; }
-  .option-card.selected {
-    border-color: var(--green);
-    background: rgba(45,80,22,0.04);
-  }
-  .option-card.selected::after {
-    content: '✓';
-    position: absolute; top: 14px; right: 16px;
-    color: var(--green); font-size: 13px; font-weight: 700;
-  }
-
+  .option-card.selected { border-color: var(--green); background: rgba(45,80,22,0.04); }
+  .option-card.selected::after { content: '✓'; position: absolute; top: 14px; right: 16px; color: var(--green); font-size: 13px; font-weight: 700; }
   .option-icon { font-size: 22px; margin-bottom: 10px; }
   .option-title { font-size: 15px; font-weight: 600; color: var(--dark); }
   .option-sub { font-size: 12px; color: #888; margin-top: 4px; font-weight: 300; }
 
-  /* PLANT PICKER */
-  .plant-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 10px; margin-bottom: 44px;
-  }
-
-  .plant-chip {
-    border: 1.5px solid rgba(45,80,22,0.12);
-    padding: 14px 12px; cursor: pointer;
-    text-align: center; background: var(--warm-white);
-    transition: all 0.2s;
-  }
+  .plant-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 44px; }
+  .plant-chip { border: 1.5px solid rgba(45,80,22,0.12); padding: 14px 12px; cursor: pointer; text-align: center; background: var(--warm-white); transition: all 0.2s; }
   .plant-chip:hover { border-color: var(--green-light); }
   .plant-chip.selected { border-color: var(--green); background: rgba(45,80,22,0.05); }
   .plant-chip .plant-emoji { font-size: 24px; display: block; margin-bottom: 6px; }
   .plant-chip .plant-name { font-size: 11px; font-weight: 500; color: var(--dark); }
   .plant-chip.selected .plant-name { color: var(--green); }
 
-  .wizard-nav {
-    display: flex; gap: 12px; align-items: center;
-  }
-
-  .btn-next {
-    background: var(--dark); color: var(--cream);
-    border: none; padding: 14px 36px;
-    font-size: 14px; font-weight: 500;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    letter-spacing: 0.5px; transition: all 0.2s;
-  }
+  .wizard-nav { display: flex; gap: 12px; align-items: center; }
+  .btn-next { background: var(--dark); color: var(--cream); border: none; padding: 14px 36px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.5px; transition: all 0.2s; }
   .btn-next:hover { background: var(--green); }
   .btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .btn-back {
-    background: transparent; border: 1.5px solid rgba(45,80,22,0.2);
-    color: #888; padding: 14px 24px; font-size: 14px;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    transition: all 0.2s;
-  }
+  .btn-back { background: transparent; border: 1.5px solid rgba(45,80,22,0.2); color: #888; padding: 14px 24px; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
   .btn-back:hover { border-color: var(--ink); color: var(--ink); }
 
-  /* RESULTS */
   .results-page { min-height: 100vh; background: var(--cream); }
-
-  .results-hero {
-    background: var(--dark); padding: 48px;
-    position: relative; overflow: hidden;
-  }
-
-  .results-hero-bg {
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 70% 50%, rgba(45,80,22,0.5) 0%, transparent 70%);
-  }
-
-  .results-nav {
-    position: relative; z-index: 2;
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 48px;
-  }
-
-  .results-eyebrow {
-    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--green-light); font-weight: 600; margin-bottom: 16px;
-    display: flex; align-items: center; gap: 10px;
-  }
+  .results-hero { background: var(--dark); padding: 48px; position: relative; overflow: hidden; }
+  .results-hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 70% 50%, rgba(45,80,22,0.5) 0%, transparent 70%); }
+  .results-nav { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px; }
+  .results-eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green-light); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
   .results-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--green-light); display: block; }
-
-  .results-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(32px, 5vw, 56px);
-    font-weight: 900; color: var(--cream);
-    line-height: 1.05; margin-bottom: 20px;
-  }
+  .results-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 56px); font-weight: 900; color: var(--cream); line-height: 1.05; margin-bottom: 20px; }
   .results-title em { color: var(--green-light); font-style: italic; }
-
-  .results-meta {
-    display: flex; gap: 24px; flex-wrap: wrap;
-  }
-
-  .meta-pill {
-    background: rgba(127,176,105,0.15);
-    border: 1px solid rgba(127,176,105,0.3);
-    padding: 6px 14px; font-size: 12px;
-    color: var(--green-light); font-weight: 500;
-  }
-
+  .results-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  .meta-pill { background: rgba(127,176,105,0.15); border: 1px solid rgba(127,176,105,0.3); padding: 6px 14px; font-size: 12px; color: var(--green-light); font-weight: 500; }
   .results-body { padding: 64px 48px; }
-
-  .overview-strip {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1px; background: rgba(45,80,22,0.1);
-    margin-bottom: 64px;
-  }
-
-  .overview-card {
-    background: var(--warm-white);
-    padding: 28px 24px;
-  }
-
-  .overview-label {
-    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--green); margin-bottom: 8px; font-weight: 600;
-  }
-
-  .overview-value {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px; font-weight: 700; color: var(--dark);
-    line-height: 1.3;
-  }
-
-  .section-header {
-    display: flex; align-items: baseline; justify-content: space-between;
-    margin-bottom: 32px;
-  }
-
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px; font-weight: 700; color: var(--dark);
-  }
-
+  .overview-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(45,80,22,0.1); margin-bottom: 64px; }
+  .overview-card { background: var(--warm-white); padding: 28px 24px; }
+  .overview-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green); margin-bottom: 8px; font-weight: 600; }
+  .overview-value { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--dark); line-height: 1.3; }
+  .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 32px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--dark); }
   .section-count { font-size: 13px; color: #999; font-weight: 300; }
-
   .plants-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 64px; }
 
-  .plant-row {
-    background: var(--warm-white);
-    border-left: 3px solid transparent;
-    transition: all 0.2s; overflow: hidden;
-  }
-
+  .plant-row { background: var(--warm-white); border-left: 3px solid transparent; transition: all 0.2s; overflow: hidden; }
   .plant-row.expanded { border-left-color: var(--green); }
-
-  .plant-row-header {
-    padding: 24px 28px; cursor: pointer;
-    display: flex; align-items: center; gap: 20px;
-    transition: background 0.2s;
-  }
+  .plant-row-header { padding: 24px 28px; cursor: pointer; display: flex; align-items: center; gap: 20px; transition: background 0.2s; }
   .plant-row-header:hover { background: rgba(45,80,22,0.03); }
-
   .plant-row-emoji { font-size: 28px; flex-shrink: 0; }
-
   .plant-row-info { flex: 1; }
-  .plant-row-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px; font-weight: 700; color: var(--dark);
-  }
+  .plant-row-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--dark); }
   .plant-row-tagline { font-size: 12px; color: #999; margin-top: 3px; font-weight: 300; }
-
   .plant-row-badges { display: flex; gap: 8px; margin-left: auto; flex-shrink: 0; }
-
-  .badge {
-    padding: 4px 10px; font-size: 10px;
-    letter-spacing: 1px; text-transform: uppercase; font-weight: 600;
-  }
+  .badge { padding: 4px 10px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
   .badge-easy { background: rgba(127,176,105,0.15); color: var(--green); }
   .badge-moderate { background: rgba(212,168,67,0.15); color: #B8860B; }
   .badge-sun { background: rgba(212,168,67,0.1); color: #C4862D; }
   .badge-part { background: rgba(127,176,105,0.1); color: var(--green-mid); }
-
-  .plant-chevron {
-    font-size: 18px; color: #ccc;
-    transition: transform 0.3s; flex-shrink: 0;
-  }
+  .plant-chevron { font-size: 18px; color: #ccc; transition: transform 0.3s; flex-shrink: 0; }
   .plant-row.expanded .plant-chevron { transform: rotate(180deg); color: var(--green); }
-
-  .plant-details {
-    padding: 0 28px 28px;
-    display: none;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
+  .plant-details { padding: 0 28px 28px; display: none; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .plant-row.expanded .plant-details { display: grid; }
-
-  .detail-block {
-    background: var(--cream);
-    padding: 20px 22px;
-  }
-
+  .detail-block { background: var(--cream); padding: 20px 22px; }
   .detail-block.full-width { grid-column: 1 / -1; }
-
-  .detail-block-label {
-    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--green); font-weight: 600; margin-bottom: 10px;
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  .detail-block-content {
-    font-size: 13px; line-height: 1.7; color: #555; font-weight: 300;
-  }
-
+  .detail-block-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green); font-weight: 600; margin-bottom: 10px; }
+  .detail-block-content { font-size: 13px; line-height: 1.7; color: #555; font-weight: 300; }
   .detail-block-content ul { list-style: none; }
-  .detail-block-content ul li {
-    padding: 4px 0; display: flex; gap: 8px; align-items: flex-start;
-  }
+  .detail-block-content ul li { padding: 4px 0; display: flex; gap: 8px; align-items: flex-start; }
   .detail-block-content ul li::before { content: '→'; color: var(--green-light); flex-shrink: 0; }
 
-  .companions-section {
-    background: var(--dark); padding: 48px;
-    margin-bottom: 64px;
-  }
-
-  .companions-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px; font-weight: 700; color: var(--cream);
-    margin-bottom: 8px;
-  }
+  .companions-section { background: var(--dark); padding: 48px; margin-bottom: 64px; }
+  .companions-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--cream); margin-bottom: 8px; }
   .companions-sub { font-size: 13px; color: rgba(245,240,232,0.4); margin-bottom: 32px; font-weight: 300; }
-
   .companions-grid { display: flex; flex-wrap: wrap; gap: 10px; }
-
-  .companion-item {
-    background: rgba(127,176,105,0.12);
-    border: 1px solid rgba(127,176,105,0.2);
-    padding: 12px 18px;
-    display: flex; align-items: center; gap: 10px;
-  }
-
+  .companion-item { background: rgba(127,176,105,0.12); border: 1px solid rgba(127,176,105,0.2); padding: 12px 18px; }
   .companion-plants { font-size: 13px; font-weight: 500; color: var(--cream); }
   .companion-note { font-size: 11px; color: rgba(245,240,232,0.5); margin-top: 2px; }
 
-  .soil-section {
-    background: var(--warm-white); padding: 48px;
-    margin-bottom: 64px; border-left: 3px solid var(--terra);
-  }
-
-  .start-over {
-    text-align: center; padding: 48px;
-    border-top: 1px solid rgba(45,80,22,0.1);
-  }
-
+  .soil-section { background: var(--warm-white); padding: 48px; margin-bottom: 64px; border-left: 3px solid var(--terra); }
+  .start-over { text-align: center; padding: 48px; border-top: 1px solid rgba(45,80,22,0.1); }
   .start-over p { font-size: 14px; color: #999; margin-bottom: 20px; font-weight: 300; }
 
-  .ai-loading {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; min-height: 400px; gap: 20px;
-  }
-
-  .ai-spinner {
-    width: 48px; height: 48px;
-    border: 2px solid rgba(45,80,22,0.1);
-    border-top-color: var(--green);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
+  .ai-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; gap: 20px; }
+  .ai-spinner { width: 48px; height: 48px; border: 2px solid rgba(45,80,22,0.1); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .ai-loading-text {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px; color: var(--dark); font-style: italic;
-  }
+  .ai-loading-text { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--dark); font-style: italic; }
   .ai-loading-sub { font-size: 13px; color: #999; font-weight: 300; }
 
   @media (max-width: 900px) {
@@ -600,24 +209,41 @@ const STYLES = `
   }
 `;
 
-interface PlantData {
-  emoji: string;
-  name: string;
-  tagline: string;
-  difficulty: "easy" | "moderate";
-  sun: "full" | "part";
-  soil: string;
-  light: string;
-  water: string;
-  tips: string[];
-  companions: string[];
-  avoid: string[];
-}
+// ── Types ────────────────────────────────────────────────────────────────────
 
 interface PlantItem {
-  id: string;
-  emoji: string;
+  slug: string;
   name: string;
+  emoji: string;
+  category: string;
+}
+
+interface CompanionEntry {
+  relationship: string;
+  note: string;
+  companion: { slug: string; name: string } | null;
+}
+
+interface TipEntry {
+  tip: string;
+  category: string;
+  sort_order: number;
+}
+
+interface PlantDetail {
+  slug: string;
+  name: string;
+  emoji: string;
+  tagline: string;
+  difficulty: string;
+  sun_requirement: string;
+  light_description: string;
+  water_description: string;
+  soil_description: string;
+  ph_min: number;
+  ph_max: number;
+  plant_tips: TipEntry[];
+  companion_planting: CompanionEntry[];
 }
 
 interface Answers {
@@ -627,202 +253,40 @@ interface Answers {
   goals: string[];
 }
 
-const PLANTS_DB: Record<string, PlantData> = {
-  basil: {
-    emoji: "🌿",
-    name: "Basil",
-    tagline: "The king of the herb garden",
-    difficulty: "easy",
-    sun: "full",
-    soil: "Well-draining, rich loam. pH 6.0–7.0. Slightly moist but never waterlogged.",
-    light: "6–8 hours of direct sun. South or west-facing balcony ideal. Will stretch and bolt in low light.",
-    water: "Consistently moist — water at the base when top inch of soil is dry. About every 1–2 days in summer.",
-    tips: [
-      "Pinch flower buds immediately to keep leaves coming",
-      "Never let it fully flower or it becomes bitter",
-      "Pot in terracotta — it breathes and prevents overwatering",
-      "Keep away from cold drafts and AC vents"
-    ],
-    companions: ["Peppers", "Tomatoes"],
-    avoid: ["Sage", "Rosemary"]
-  },
-  thyme: {
-    emoji: "🌱",
-    name: "Thyme",
-    tagline: "Mediterranean drought-tough beauty",
-    difficulty: "easy",
-    sun: "full",
-    soil: "Sandy, gritty, low-fertility. pH 6.0–8.0. Excellent drainage is critical — it despises wet roots.",
-    light: "Full sun, 6+ hours. One of the most sun-tolerant herbs — thrives on hot, south-facing spots.",
-    water: "Drought tolerant. Water deeply but infrequently — every 7–10 days. Let soil dry completely.",
-    tips: [
-      "Add grit or perlite to potting mix for drainage",
-      "Trim after flowering to keep plant bushy",
-      "Woody stems can be propagated easily by layering",
-      "Hardy to light frost — one of the last herbs standing in fall"
-    ],
-    companions: ["Rosemary", "Lavender", "Sage"],
-    avoid: ["Basil", "Mint"]
-  },
-  sage: {
-    emoji: "🌾",
-    name: "Sage",
-    tagline: "Silvery-leaved Mediterranean native",
-    difficulty: "easy",
-    sun: "full",
-    soil: "Well-draining, sandy or loamy. pH 6.0–7.0. Low to moderate fertility — too rich causes floppy growth.",
-    light: "Full sun, 6–8 hours minimum. Tolerates light afternoon shade in very hot climates.",
-    water: "Low water needs once established. Water every 7–10 days, allowing drying between waterings.",
-    tips: [
-      "Prune hard in spring to prevent woodiness",
-      "Excellent in terracotta or unglazed pots",
-      "Avoid high-nitrogen fertilizers — promotes leaf at expense of flavor",
-      "Flowers are edible and attract beneficial insects"
-    ],
-    companions: ["Rosemary", "Thyme", "Lavender"],
-    avoid: ["Basil", "Cucumbers"]
-  },
-  dill: {
-    emoji: "🌻",
-    name: "Dill",
-    tagline: "Feathery, fast-growing annual",
-    difficulty: "moderate",
-    sun: "full",
-    soil: "Rich, loose, well-draining. pH 5.8–6.5. Needs room to send deep taproot — use deep pots.",
-    light: "Full sun, 6–8 hours. Without enough light it goes leggy quickly.",
-    water: "Moderate — keep evenly moist but not wet. Water every 2–3 days in containers.",
-    tips: [
-      "Use containers at least 12\" deep for taproot",
-      "Succession sow every 3 weeks for continuous harvest",
-      "Bolt-resistant varieties like 'Fernleaf' work best in pots",
-      "Harvest before it flowers for best flavor"
-    ],
-    companions: ["Basil", "Peppers"],
-    avoid: ["Fennel", "Lavender", "Mint"]
-  },
-  mint: {
-    emoji: "🌿",
-    name: "Mint",
-    tagline: "Vigorous, aromatic — pot it alone",
-    difficulty: "easy",
-    sun: "part",
-    soil: "Rich, moist, well-draining. pH 6.0–7.0. Loves consistent moisture more than most herbs.",
-    light: "Partial sun — thrives with 3–6 hours. One of few herbs that tolerates shade well.",
-    water: "Keep consistently moist — water every 1–2 days. More forgiving of overwatering than most.",
-    tips: [
-      "ALWAYS grow in its own container — it will invade everything",
-      "Aggressive spreader — double-pot method contains roots",
-      "Trim regularly to prevent flowering and keep bushy",
-      "Spearmint, peppermint, and chocolate mint all work well in pots"
-    ],
-    companions: ["Standalone only"],
-    avoid: ["Everything — keep isolated to prevent takeover"]
-  },
-  lavender: {
-    emoji: "💜",
-    name: "Lavender",
-    tagline: "Drought-hardy, pollinator magnet",
-    difficulty: "moderate",
-    sun: "full",
-    soil: "Sandy, alkaline, extremely well-draining. pH 6.5–7.5. Add lime to raise pH if needed. Hates wet feet.",
-    light: "Full sun, 8+ hours. The more sun, the more fragrant and floriferous.",
-    water: "Very drought tolerant. Water deeply every 2 weeks once established. Root rot is the #1 killer.",
-    tips: [
-      "Use terracotta with drainage holes — glazed pots can cause waterlogging",
-      "Prune to one third after first bloom flush",
-      "English lavender (L. angustifolia) most compact for pots",
-      "Deadhead spent flowers to encourage reblooming"
-    ],
-    companions: ["Rosemary", "Thyme", "Sage"],
-    avoid: ["Mint", "Basil"]
-  },
-  rosemary: {
-    emoji: "🌿",
-    name: "Rosemary",
-    tagline: "Woody Mediterranean perennial",
-    difficulty: "easy",
-    sun: "full",
-    soil: "Sandy, gritty, alkaline. pH 6.0–8.0. Drainage is everything — mix in 30–40% perlite.",
-    light: "Full sun, 6–8 hours minimum. Leggy, sparse growth indicates insufficient light.",
-    water: "Allow soil to dry fully between waterings. Every 10–14 days in cool months, weekly in summer heat.",
-    tips: [
-      "Do not crowd — good air circulation prevents powdery mildew",
-      "Upright varieties grow tall; 'Prostrate' is trailing for balcony rails",
-      "Repot every 2–3 years as it becomes root bound",
-      "Bring indoors if temps drop below 20°F (−6°C)"
-    ],
-    companions: ["Lavender", "Thyme", "Sage"],
-    avoid: ["Mint", "Basil"]
-  },
-  peppers: {
-    emoji: "🌶️",
-    name: "Peppers",
-    tagline: "Heat-loving, sun-hungry, rewarding",
-    difficulty: "moderate",
-    sun: "full",
-    soil: "Rich, fertile, well-draining loam. pH 6.0–6.8. Mix in compost heavily. Needs more nutrients than herbs.",
-    light: "Full sun, 8+ hours. Critical for fruit set. Insufficient sun = lots of foliage, few peppers.",
-    water: "Consistent moisture — water every 2–3 days. Avoid drought stress during flowering or peppers drop.",
-    tips: [
-      "Use 5-gallon+ containers — bigger pot = bigger yield",
-      "Stake plants as they grow — stems are brittle in wind",
-      "Feed with low-nitrogen, high-phosphorus fertilizer once fruiting starts",
-      "Heat stress above 95°F causes blossom drop — provide afternoon shade"
-    ],
-    companions: ["Basil", "Dill"],
-    avoid: ["Fennel", "Mint"]
-  }
-};
+// ── UI Config (not plant data) ───────────────────────────────────────────────
 
 const WIZARD_STEPS = [
-  { id: "space", title: "Your Space", subtitle: "What are you working with?" },
-  { id: "experience", title: "Your Experience", subtitle: "How green is your thumb?" },
-  { id: "plants", title: "Plant Selection", subtitle: "What do you want to grow?" },
-  { id: "goals", title: "Your Goals", subtitle: "What matters most?" },
+  { id: "space",      title: "Your Space",      subtitle: "What are you working with?" },
+  { id: "experience", title: "Your Experience",  subtitle: "How green is your thumb?" },
+  { id: "plants",     title: "Plant Selection",  subtitle: "What do you want to grow?" },
+  { id: "goals",      title: "Your Goals",       subtitle: "What matters most?" },
 ];
 
 const SPACE_OPTIONS = [
-  { id: "balcony", icon: "🏙️", title: "Balcony / Patio", sub: "Container gardening, limited sq footage" },
-  { id: "raised", icon: "🪴", title: "Raised Beds", sub: "Dedicated beds, more control" },
-  { id: "small-yard", icon: "🌱", title: "Small Yard", sub: "Up to 1,000 sq ft of growing space" },
-  { id: "large-yard", icon: "🌳", title: "Large Yard / Plot", sub: "1/4 acre or more" },
+  { id: "balcony",    icon: "🏙️", title: "Balcony / Patio",    sub: "Container gardening, limited sq footage" },
+  { id: "raised_bed", icon: "🪴", title: "Raised Beds",         sub: "Dedicated beds, more control" },
+  { id: "small_yard", icon: "🌱", title: "Small Yard",          sub: "Up to 1,000 sq ft of growing space" },
+  { id: "large_yard", icon: "🌳", title: "Large Yard / Plot",   sub: "1/4 acre or more" },
 ];
 
 const EXPERIENCE_OPTIONS = [
-  { id: "new", icon: "🌱", title: "Complete Beginner", sub: "Never grown anything" },
-  { id: "some", icon: "🌿", title: "Some Experience", sub: "A few seasons under my belt" },
+  { id: "new",       icon: "🌱", title: "Complete Beginner",  sub: "Never grown anything" },
+  { id: "some",      icon: "🌿", title: "Some Experience",    sub: "A few seasons under my belt" },
   { id: "confident", icon: "🌳", title: "Confident Gardener", sub: "Know my way around a garden" },
 ];
 
 const GOAL_OPTIONS = [
-  { id: "eat", icon: "🍽️", title: "Grow food to eat", sub: null },
-  { id: "beauty", icon: "🌸", title: "Beautiful outdoor space", sub: null },
-  { id: "learn", icon: "📚", title: "Learn & experiment", sub: null },
-  { id: "wellness", icon: "🧘", title: "Therapeutic & mindful", sub: null },
-];
-
-const ALL_PLANTS: PlantItem[] = [
-  { id: "basil", emoji: "🌿", name: "Basil" },
-  { id: "thyme", emoji: "🌱", name: "Thyme" },
-  { id: "sage", emoji: "🌾", name: "Sage" },
-  { id: "dill", emoji: "🌻", name: "Dill" },
-  { id: "mint", emoji: "🍃", name: "Mint" },
-  { id: "lavender", emoji: "💜", name: "Lavender" },
-  { id: "rosemary", emoji: "🌿", name: "Rosemary" },
-  { id: "peppers", emoji: "🌶️", name: "Peppers" },
-  { id: "tomatoes", emoji: "🍅", name: "Tomatoes" },
-  { id: "lettuce", emoji: "🥬", name: "Lettuce" },
-  { id: "chives", emoji: "🌿", name: "Chives" },
-  { id: "parsley", emoji: "🌿", name: "Parsley" },
-  { id: "cucumber", emoji: "🥒", name: "Cucumber" },
-  { id: "strawberry", emoji: "🍓", name: "Strawberry" },
-  { id: "kale", emoji: "🥦", name: "Kale" },
-  { id: "zucchini", emoji: "🥗", name: "Zucchini" },
+  { id: "eat",       icon: "🍽️", title: "Grow food to eat" },
+  { id: "beauty",    icon: "🌸", title: "Beautiful outdoor space" },
+  { id: "learn",     icon: "📚", title: "Learn & experiment" },
+  { id: "wellness",  icon: "🧘", title: "Therapeutic & mindful" },
 ];
 
 function getSpaceLabel(id: string | null): string {
   return SPACE_OPTIONS.find(s => s.id === id)?.title ?? id ?? "";
 }
+
+// ── Sub-components ───────────────────────────────────────────────────────────
 
 function SunBadge({ type }: { type: string }) {
   return type === "full"
@@ -836,22 +300,28 @@ function DiffBadge({ level }: { level: string }) {
     : <span className="badge badge-moderate">Moderate</span>;
 }
 
-function PlantRow({ plant }: { plant: PlantItem }) {
+function PlantRow({ plant }: { plant: PlantDetail }) {
   const [open, setOpen] = useState(false);
-  const data = PLANTS_DB[plant.id];
-  if (!data) return null;
+
+  const beneficial = plant.companion_planting
+    .filter(c => c.relationship === "beneficial" && c.companion)
+    .map(c => c.companion!.name);
+
+  const harmful = plant.companion_planting
+    .filter(c => c.relationship === "harmful" && c.companion)
+    .map(c => c.companion!.name);
 
   return (
     <div className={`plant-row ${open ? "expanded" : ""}`}>
       <div className="plant-row-header" onClick={() => setOpen(!open)}>
-        <span className="plant-row-emoji">{data.emoji}</span>
+        <span className="plant-row-emoji">{plant.emoji}</span>
         <div className="plant-row-info">
-          <div className="plant-row-name">{data.name}</div>
-          <div className="plant-row-tagline">{data.tagline}</div>
+          <div className="plant-row-name">{plant.name}</div>
+          <div className="plant-row-tagline">{plant.tagline}</div>
         </div>
         <div className="plant-row-badges">
-          <SunBadge type={data.sun} />
-          <DiffBadge level={data.difficulty} />
+          <SunBadge type={plant.sun_requirement} />
+          <DiffBadge level={plant.difficulty} />
         </div>
         <span className="plant-chevron">⌄</span>
       </div>
@@ -859,28 +329,34 @@ function PlantRow({ plant }: { plant: PlantItem }) {
       <div className="plant-details">
         <div className="detail-block">
           <div className="detail-block-label">☀ Light Requirements</div>
-          <div className="detail-block-content">{data.light}</div>
+          <div className="detail-block-content">{plant.light_description}</div>
         </div>
         <div className="detail-block">
           <div className="detail-block-label">💧 Watering</div>
-          <div className="detail-block-content">{data.water}</div>
+          <div className="detail-block-content">{plant.water_description}</div>
         </div>
         <div className="detail-block">
           <div className="detail-block-label">🌍 Soil Composition</div>
-          <div className="detail-block-content">{data.soil}</div>
+          <div className="detail-block-content">
+            {plant.soil_description}
+            {plant.ph_min && plant.ph_max && (
+              <> pH {plant.ph_min}–{plant.ph_max}.</>
+            )}
+          </div>
         </div>
         <div className="detail-block">
           <div className="detail-block-label">🤝 Companion Plants</div>
           <div className="detail-block-content">
-            <strong>Grows well with: </strong>{data.companions.join(", ")}<br />
-            <strong>Keep away from: </strong>{data.avoid.join(", ")}
+            {beneficial.length > 0 && <><strong>Grows well with: </strong>{beneficial.join(", ")}<br /></>}
+            {harmful.length > 0 && <><strong>Keep away from: </strong>{harmful.join(", ")}</>}
+            {beneficial.length === 0 && harmful.length === 0 && "No companion data yet."}
           </div>
         </div>
         <div className="detail-block full-width">
           <div className="detail-block-label">💡 Pro Tips</div>
           <div className="detail-block-content">
             <ul>
-              {data.tips.map((t, i) => <li key={i}>{t}</li>)}
+              {plant.plant_tips.map((t, i) => <li key={i}>{t.tip}</li>)}
             </ul>
           </div>
         </div>
@@ -888,6 +364,8 @@ function PlantRow({ plant }: { plant: PlantItem }) {
     </div>
   );
 }
+
+// ── Pages ────────────────────────────────────────────────────────────────────
 
 function HomePage({ onStart }: { onStart: () => void }) {
   return (
@@ -905,38 +383,23 @@ function HomePage({ onStart }: { onStart: () => void }) {
         </nav>
         <div className="hero-content">
           <div className="hero-eyebrow">The Garden Planning Tool</div>
-          <h1 className="hero-title">
-            Grow <em>anything.</em><br />
-            Anywhere.
-          </h1>
-          <p className="hero-sub">
-            From a single herb pot on your balcony to a quarter-acre backyard — personalized guidance for every gardener, every space.
-          </p>
+          <h1 className="hero-title">Grow <em>anything.</em><br />Anywhere.</h1>
+          <p className="hero-sub">From a single herb pot on your balcony to a quarter-acre backyard — personalized guidance for every gardener, every space.</p>
           <div className="hero-cta">
             <button className="btn-primary" onClick={onStart}>Plan My Garden →</button>
             <button className="btn-ghost">See How It Works</button>
           </div>
         </div>
         <div className="hero-bottom">
-          <div className="stat">
-            <div className="stat-num">200+</div>
-            <div className="stat-label">Plant Profiles</div>
-          </div>
-          <div className="stat">
-            <div className="stat-num">12</div>
-            <div className="stat-label">Climate Zones</div>
-          </div>
-          <div className="stat">
-            <div className="stat-num">Any</div>
-            <div className="stat-label">Space Size</div>
-          </div>
+          <div><div className="stat-num">200+</div><div className="stat-label">Plant Profiles</div></div>
+          <div><div className="stat-num">12</div><div className="stat-label">Climate Zones</div></div>
+          <div><div className="stat-num">Any</div><div className="stat-label">Space Size</div></div>
         </div>
         <div className="hero-image-col">
           <div className="hero-img-panel" />
           <div className="img-caption">Balcony Herb Collection — Summer Edition</div>
         </div>
       </div>
-
       <div className="features-strip">
         <div className="section-label">Why Terra</div>
         <div className="features-grid">
@@ -961,7 +424,13 @@ function HomePage({ onStart }: { onStart: () => void }) {
   );
 }
 
-function WizardPage({ onComplete, onBack }: { onComplete: (answers: Answers) => void; onBack: () => void }) {
+function WizardPage({
+  allPlants, onComplete, onBack,
+}: {
+  allPlants: PlantItem[];
+  onComplete: (answers: Answers) => void;
+  onBack: () => void;
+}) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({ space: null, experience: null, plants: [], goals: [] });
 
@@ -978,27 +447,25 @@ function WizardPage({ onComplete, onBack }: { onComplete: (answers: Answers) => 
     else onComplete(answers);
   }
 
-  function togglePlant(id: string) {
+  function togglePlant(slug: string) {
     setAnswers(a => ({
       ...a,
-      plants: a.plants.includes(id) ? a.plants.filter(p => p !== id) : [...a.plants, id]
+      plants: a.plants.includes(slug) ? a.plants.filter(p => p !== slug) : [...a.plants, slug],
     }));
   }
 
   function toggleGoal(id: string) {
     setAnswers(a => ({
       ...a,
-      goals: a.goals.includes(id) ? a.goals.filter(g => g !== id) : [...a.goals, id]
+      goals: a.goals.includes(id) ? a.goals.filter(g => g !== id) : [...a.goals, id],
     }));
   }
-
-  const progress = (step / WIZARD_STEPS.length) * 100;
 
   const tips = [
     "Balcony gardens shine with container-friendly herbs like basil, mint, and thyme.",
     "Even a few hours of sun on a north-facing balcony can support lettuce and herbs.",
     "Mix plants thoughtfully — companion planting reduces pests naturally.",
-    "Most herb gardens can sustain a household from just 4–6 plants."
+    "Most herb gardens can sustain a household from just 4–6 plants.",
   ];
 
   return (
@@ -1009,7 +476,7 @@ function WizardPage({ onComplete, onBack }: { onComplete: (answers: Answers) => 
           {WIZARD_STEPS.map((s, i) => (
             <div key={s.id} className={`wizard-step-item ${i === step ? "active" : ""} ${i < step ? "done" : ""}`}>
               <div className="step-num">{i < step ? "✓" : i + 1}</div>
-              <div className="step-info">
+              <div>
                 <div className="step-title">{s.title}</div>
                 <div className="step-subtitle">{s.subtitle}</div>
               </div>
@@ -1021,7 +488,7 @@ function WizardPage({ onComplete, onBack }: { onComplete: (answers: Answers) => 
 
       <div className="wizard-main">
         <div className="wizard-progress">
-          <div className="wizard-progress-fill" style={{ width: `${progress}%` }} />
+          <div className="wizard-progress-fill" style={{ width: `${(step / WIZARD_STEPS.length) * 100}%` }} />
         </div>
 
         {step === 0 && (
@@ -1066,9 +533,9 @@ function WizardPage({ onComplete, onBack }: { onComplete: (answers: Answers) => 
             <h2 className="wizard-question">What do you want to <em>grow?</em></h2>
             <p className="wizard-desc">Pick everything you&apos;re interested in — we&apos;ll check compatibility and give tips for each.</p>
             <div className="plant-grid">
-              {ALL_PLANTS.map(p => (
-                <div key={p.id} className={`plant-chip ${answers.plants.includes(p.id) ? "selected" : ""}`}
-                  onClick={() => togglePlant(p.id)}>
+              {allPlants.map(p => (
+                <div key={p.slug} className={`plant-chip ${answers.plants.includes(p.slug) ? "selected" : ""}`}
+                  onClick={() => togglePlant(p.slug)}>
                   <span className="plant-emoji">{p.emoji}</span>
                   <span className="plant-name">{p.name}</span>
                 </div>
@@ -1108,48 +575,36 @@ function WizardPage({ onComplete, onBack }: { onComplete: (answers: Answers) => 
 function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () => void }) {
   const [loading, setLoading] = useState(true);
   const [aiInsight, setAiInsight] = useState("");
-
-  const selectedPlants = ALL_PLANTS.filter(p => answers.plants.includes(p.id));
-  const knownPlants = selectedPlants.filter(p => PLANTS_DB[p.id]);
-  const sunNeeds = knownPlants.filter(p => PLANTS_DB[p.id]?.sun === "full").map(p => p.name);
-  const shadeOk = knownPlants.filter(p => PLANTS_DB[p.id]?.sun === "part").map(p => p.name);
-
-  const companionPairs: { key: string; plants: string[]; note: string }[] = [];
-  knownPlants.forEach(p => {
-    const data = PLANTS_DB[p.id];
-    data.companions.forEach(c => {
-      const match = knownPlants.find(kp => kp.name === c);
-      if (match) {
-        const key = [p.name, match.name].sort().join("-");
-        if (!companionPairs.find(cp => cp.key === key)) {
-          companionPairs.push({ key, plants: [p.name, match.name], note: "Great pairing — grow together" });
-        }
-      }
-    });
-  });
+  const [plantDetails, setPlantDetails] = useState<PlantDetail[]>([]);
 
   useEffect(() => {
-    const fetchInsight = async () => {
+    const fetchAll = async () => {
       try {
-        const plantNames = selectedPlants.map(p => p.name).join(", ");
-        const experienceLabel = answers.experience === "new" ? "beginner" : answers.experience === "some" ? "intermediate" : "experienced";
-        const spaceLabel = getSpaceLabel(answers.space).toLowerCase();
-        const prompt = `A ${experienceLabel} gardener with a ${spaceLabel} wants to grow: ${plantNames}. Write a 2-3 sentence personalized garden insight — enthusiastic, specific, actionable. Mention 1-2 of their specific plants. No markdown, no bullet points, pure prose. Keep it warm and encouraging.`;
+        const [detailsRes, insightRes] = await Promise.all([
+          fetch("/api/plants/details", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slugs: answers.plants }),
+          }),
+          fetch("/api/garden-insight", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: `A ${answers.experience === "new" ? "beginner" : answers.experience === "some" ? "intermediate" : "experienced"} gardener with a ${getSpaceLabel(answers.space).toLowerCase()} wants to grow: ${answers.plants.join(", ")}. Write a 2-3 sentence personalized garden insight — enthusiastic, specific, actionable. Mention 1-2 of their specific plants. No markdown, no bullet points, pure prose. Keep it warm and encouraging.`,
+            }),
+          }),
+        ]);
 
-        const response = await fetch("/api/garden-insight", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt }),
-        });
-        const data = await response.json();
-        setAiInsight(data.text ?? "");
+        const [details, insight] = await Promise.all([detailsRes.json(), insightRes.json()]);
+        setPlantDetails(details);
+        setAiInsight(insight.text ?? "");
       } catch {
-        setAiInsight("Your plant selection is wonderfully curated for your space. The combination of sun-loving herbs and peppers will thrive together — just watch your mint, it loves to take over!");
+        setAiInsight("Your plant selection is beautifully curated. Follow the guides below and you'll have a thriving garden in no time!");
       } finally {
         setLoading(false);
       }
     };
-    fetchInsight();
+    fetchAll();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1159,11 +614,28 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
         <div className="ai-loading">
           <div className="ai-spinner" />
           <div className="ai-loading-text">Building your garden guide…</div>
-          <div className="ai-loading-sub">Analyzing {selectedPlants.length} plants for {getSpaceLabel(answers.space).toLowerCase()}</div>
+          <div className="ai-loading-sub">Fetching data for {answers.plants.length} plants</div>
         </div>
       </div>
     );
   }
+
+  const sunNeeds = plantDetails.filter(p => p.sun_requirement === "full").map(p => p.name);
+  const shadeOk  = plantDetails.filter(p => p.sun_requirement === "partial").map(p => p.name);
+
+  // Build companion pairs from plants that are both in the selection
+  const selectedSlugs = new Set(plantDetails.map(p => p.slug));
+  const companionPairs: { key: string; plants: string[]; note: string }[] = [];
+  plantDetails.forEach(plant => {
+    plant.companion_planting
+      .filter(c => c.relationship === "beneficial" && c.companion && selectedSlugs.has(c.companion.slug))
+      .forEach(c => {
+        const key = [plant.slug, c.companion!.slug].sort().join("-");
+        if (!companionPairs.find(p => p.key === key)) {
+          companionPairs.push({ key, plants: [plant.name, c.companion!.name], note: c.note });
+        }
+      });
+  });
 
   return (
     <div className="results-page">
@@ -1175,11 +647,10 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           </div>
           <button className="btn-ghost" onClick={onRestart} style={{ fontSize: 12 }}>← Start Over</button>
         </div>
-        <div className="results-summary">
+        <div>
           <div className="results-eyebrow">Your Personal Garden Guide</div>
           <h1 className="results-title">
-            <em>{selectedPlants.length} plants</em> for your<br />
-            {getSpaceLabel(answers.space)}
+            <em>{plantDetails.length} plants</em> for your<br />{getSpaceLabel(answers.space)}
           </h1>
           <div className="results-meta">
             <span className="meta-pill">🏡 {getSpaceLabel(answers.space)}</span>
@@ -1194,12 +665,7 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
 
       <div className="results-body">
         {aiInsight && (
-          <div style={{
-            background: "rgba(45,80,22,0.06)", borderLeft: "3px solid var(--green-light)",
-            padding: "24px 28px", marginBottom: 48,
-            fontFamily: "'Playfair Display', serif", fontSize: 18,
-            fontStyle: "italic", color: "var(--dark)", lineHeight: 1.7
-          }}>
+          <div style={{ background: "rgba(45,80,22,0.06)", borderLeft: "3px solid var(--green-light)", padding: "24px 28px", marginBottom: 48, fontFamily: "'Playfair Display', serif", fontSize: 18, fontStyle: "italic", color: "var(--dark)", lineHeight: 1.7 }}>
             ✦ {aiInsight}
           </div>
         )}
@@ -1219,16 +685,16 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           </div>
           <div className="overview-card">
             <div className="overview-label">Difficulty Range</div>
-            <div className="overview-value">{knownPlants.some(p => PLANTS_DB[p.id]?.difficulty === "moderate") ? "Easy to Moderate" : "All Easy"}</div>
+            <div className="overview-value">{plantDetails.some(p => p.difficulty === "moderate") ? "Easy to Moderate" : "All Easy"}</div>
           </div>
         </div>
 
         <div className="section-header">
           <div className="section-title">Plant-by-Plant Guide</div>
-          <div className="section-count">{knownPlants.length} plants — click to expand</div>
+          <div className="section-count">{plantDetails.length} plants — click to expand</div>
         </div>
         <div className="plants-list">
-          {knownPlants.map(p => <PlantRow key={p.id} plant={p} />)}
+          {plantDetails.map(p => <PlantRow key={p.slug} plant={p} />)}
         </div>
 
         {companionPairs.length > 0 && (
@@ -1253,10 +719,10 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           <p style={{ color: "#999", fontSize: 13, marginBottom: 20, fontWeight: 300 }}>For your {getSpaceLabel(answers.space).toLowerCase()} — adjust per plant guide above</p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             {[
-              { label: "Base Mix", value: "60% quality potting mix, 30% perlite for drainage, 10% compost for nutrients" },
-              { label: "pH Range", value: "6.0–7.0 covers most herbs and peppers. Lavender prefers slightly more alkaline (6.5–7.5)" },
-              { label: "Fertilizing", value: "Slow-release granules at planting. Liquid feed every 2–3 weeks through the growing season." },
-              { label: "Container Tip", value: "Terracotta over plastic — breathes better. Size up for peppers (5gal+). Mint gets its own pot, always." }
+              { label: "Base Mix",       value: "60% quality potting mix, 30% perlite for drainage, 10% compost for nutrients" },
+              { label: "pH Range",       value: "6.0–7.0 covers most herbs and peppers. Lavender prefers slightly more alkaline (6.5–7.5)" },
+              { label: "Fertilizing",   value: "Slow-release granules at planting. Liquid feed every 2–3 weeks through the growing season." },
+              { label: "Container Tip", value: "Terracotta over plastic — breathes better. Size up for peppers (5gal+). Mint gets its own pot, always." },
             ].map(item => (
               <div key={item.label} style={{ padding: "16px 0", borderBottom: "1px solid rgba(45,80,22,0.1)" }}>
                 <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--green)", fontWeight: 600, marginBottom: 6 }}>{item.label}</div>
@@ -1275,9 +741,19 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
   );
 }
 
+// ── Root App ─────────────────────────────────────────────────────────────────
+
 export default function App() {
   const [view, setView] = useState("home");
   const [answers, setAnswers] = useState<Answers | null>(null);
+  const [allPlants, setAllPlants] = useState<PlantItem[]>([]);
+
+  useEffect(() => {
+    fetch("/api/plants")
+      .then(r => r.json())
+      .then(setAllPlants)
+      .catch(() => {});
+  }, []);
 
   return (
     <>
@@ -1285,6 +761,7 @@ export default function App() {
       {view === "home" && <HomePage onStart={() => setView("wizard")} />}
       {view === "wizard" && (
         <WizardPage
+          allPlants={allPlants}
           onComplete={a => { setAnswers(a); setView("results"); }}
           onBack={() => setView("home")}
         />
