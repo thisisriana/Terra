@@ -499,7 +499,7 @@ function WizardPage({
             <div className="options-grid cols-2">
               {SPACE_OPTIONS.map(opt => (
                 <div key={opt.id} className={`option-card ${answers.space === opt.id ? "selected" : ""}`}
-                  onClick={() => setAnswers(a => ({ ...a, space: opt.id }))}>
+                  onClick={() => { setAnswers(a => ({ ...a, space: opt.id })); setTimeout(next, 150); }}>
                   <div className="option-icon">{opt.icon}</div>
                   <div className="option-title">{opt.title}</div>
                   <div className="option-sub">{opt.sub}</div>
@@ -517,7 +517,7 @@ function WizardPage({
             <div className="options-grid cols-3">
               {EXPERIENCE_OPTIONS.map(opt => (
                 <div key={opt.id} className={`option-card ${answers.experience === opt.id ? "selected" : ""}`}
-                  onClick={() => setAnswers(a => ({ ...a, experience: opt.id }))}>
+                  onClick={() => { setAnswers(a => ({ ...a, experience: opt.id })); setTimeout(next, 150); }}>
                   <div className="option-icon">{opt.icon}</div>
                   <div className="option-title">{opt.title}</div>
                   <div className="option-sub">{opt.sub}</div>
@@ -623,19 +623,40 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
   const sunNeeds = plantDetails.filter(p => p.sun_requirement === "full").map(p => p.name);
   const shadeOk  = plantDetails.filter(p => p.sun_requirement === "partial").map(p => p.name);
 
-  // Build companion pairs from plants that are both in the selection
+  // Group compatible plants using union-find on beneficial relationships
   const selectedSlugs = new Set(plantDetails.map(p => p.slug));
-  const companionPairs: { key: string; plants: string[]; note: string }[] = [];
+  const parent: Record<string, string> = {};
+  plantDetails.forEach(p => { parent[p.slug] = p.slug; });
+  const find = (x: string): string => { if (parent[x] !== x) parent[x] = find(parent[x]); return parent[x]; };
+  const union = (x: string, y: string) => { parent[find(x)] = find(y); };
+
+  // Track harmful pairs to warn about
+  const harmfulPairs: { key: string; names: string[] }[] = [];
+  const seenHarmful = new Set<string>();
+
   plantDetails.forEach(plant => {
-    plant.companion_planting
-      .filter(c => c.relationship === "beneficial" && c.companion && selectedSlugs.has(c.companion.slug))
-      .forEach(c => {
-        const key = [plant.slug, c.companion!.slug].sort().join("-");
-        if (!companionPairs.find(p => p.key === key)) {
-          companionPairs.push({ key, plants: [plant.name, c.companion!.name], note: c.note });
+    plant.companion_planting.forEach(c => {
+      if (!c.companion || !selectedSlugs.has(c.companion.slug)) return;
+      if (c.relationship === "beneficial") {
+        union(plant.slug, c.companion.slug);
+      } else if (c.relationship === "harmful") {
+        const key = [plant.slug, c.companion.slug].sort().join("-");
+        if (!seenHarmful.has(key)) {
+          seenHarmful.add(key);
+          harmfulPairs.push({ key, names: [plant.name, c.companion.name] });
         }
-      });
+      }
+    });
   });
+
+  // Build groups from union-find roots
+  const groupMap: Record<string, string[]> = {};
+  plantDetails.forEach(p => {
+    const root = find(p.slug);
+    if (!groupMap[root]) groupMap[root] = [];
+    groupMap[root].push(p.name);
+  });
+  const compatibleGroups = Object.values(groupMap).filter(g => g.length >= 2);
 
   return (
     <div className="results-page">
@@ -680,8 +701,8 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
             <div className="overview-value">{shadeOk.join(", ") || "—"}</div>
           </div>
           <div className="overview-card">
-            <div className="overview-label">Companion Pairs</div>
-            <div className="overview-value">{companionPairs.length} found in your selection</div>
+            <div className="overview-label">Compatible Groups</div>
+            <div className="overview-value">{compatibleGroups.length > 0 ? `${compatibleGroups.length} group${compatibleGroups.length > 1 ? "s" : ""} found` : "None in selection"}</div>
           </div>
           <div className="overview-card">
             <div className="overview-label">Difficulty Range</div>
@@ -697,20 +718,38 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           {plantDetails.map(p => <PlantRow key={p.slug} plant={p} />)}
         </div>
 
-        {companionPairs.length > 0 && (
+        {(compatibleGroups.length > 0 || harmfulPairs.length > 0) && (
           <div className="companions-section">
-            <div className="companions-title">Companion Planting Map</div>
-            <div className="companions-sub">Based on your specific plant selection — place these near each other</div>
-            <div className="companions-grid">
-              {companionPairs.map(cp => (
-                <div key={cp.key} className="companion-item">
-                  <div>
-                    <div className="companion-plants">{cp.plants[0]} + {cp.plants[1]}</div>
-                    <div className="companion-note">{cp.note}</div>
-                  </div>
+            <div className="companions-title">Companion Planting Guide</div>
+            <div className="companions-sub">Based on your specific plant selection</div>
+
+            {compatibleGroups.length > 0 && (
+              <>
+                <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--green-light)", fontWeight: 600, marginBottom: 12 }}>✓ Grow Together</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: harmfulPairs.length > 0 ? 32 : 0 }}>
+                  {compatibleGroups.map((group, i) => (
+                    <div key={i} className="companion-item" style={{ display: "block" }}>
+                      <div className="companion-plants">{group.join(", ")}</div>
+                      <div className="companion-note">These plants grow well together — place them in the same bed or nearby containers</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
+
+            {harmfulPairs.length > 0 && (
+              <>
+                <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#C4622D", fontWeight: 600, marginBottom: 12 }}>✗ Keep Separate</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {harmfulPairs.map(pair => (
+                    <div key={pair.key} style={{ background: "rgba(196,98,45,0.08)", border: "1px solid rgba(196,98,45,0.2)", padding: "12px 18px" }}>
+                      <div className="companion-plants" style={{ color: "#C4622D" }}>{pair.names.join(" and ")}</div>
+                      <div className="companion-note">Incompatible — grow in separate containers or opposite ends of the garden</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
