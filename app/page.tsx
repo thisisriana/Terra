@@ -186,6 +186,24 @@ const STYLES = `
   .start-over { text-align: center; padding: 48px; border-top: 1px solid rgba(45,80,22,0.1); }
   .start-over p { font-size: 14px; color: #999; margin-bottom: 20px; font-weight: 300; }
 
+  .calendar-section { background: var(--warm-white); padding: 48px; margin-bottom: 64px; border-left: 3px solid var(--green); overflow-x: auto; }
+  .calendar-legend { display: flex; gap: 24px; margin-bottom: 28px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666; font-weight: 400; }
+  .legend-swatch { width: 16px; height: 16px; border-radius: 2px; flex-shrink: 0; }
+  .calendar-grid { min-width: 640px; }
+  .calendar-header-row { display: grid; grid-template-columns: 130px repeat(12, 1fr); gap: 2px; margin-bottom: 4px; }
+  .calendar-month-label { text-align: center; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #aaa; font-weight: 600; padding: 4px 0; }
+  .calendar-month-label.current { color: var(--green); font-weight: 700; }
+  .calendar-plant-row { display: grid; grid-template-columns: 130px repeat(12, 1fr); gap: 2px; margin-bottom: 2px; }
+  .calendar-plant-name { font-size: 11px; font-weight: 500; color: var(--dark); display: flex; align-items: center; gap: 5px; padding-right: 8px; overflow: hidden; white-space: nowrap; }
+  .calendar-cell { height: 26px; border-radius: 2px; }
+  .calendar-cell.empty { background: rgba(45,80,22,0.04); }
+  .calendar-cell.indoor { background: #D4A843; }
+  .calendar-cell.outdoor { background: #7FB069; }
+  .calendar-cell.harvest { background: rgba(74,124,47,0.25); border: 1px solid rgba(74,124,47,0.3); }
+  .calendar-cell.current-month { outline: 2px solid rgba(45,80,22,0.3); outline-offset: -2px; }
+  .calendar-notes { font-size: 12px; color: #777; line-height: 1.6; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(45,80,22,0.1); font-weight: 300; }
+
   .ai-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; gap: 20px; }
   .ai-spinner { width: 48px; height: 48px; border: 2px solid rgba(45,80,22,0.1); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -250,8 +268,19 @@ interface PlantDetail {
 interface Answers {
   space: string | null;
   experience: string | null;
+  zone: string | null;
   plants: string[];
   goals: string[];
+}
+
+interface PlantSchedule {
+  slug: string;
+  name: string;
+  emoji: string;
+  indoor_start_months: number[] | null;
+  outdoor_plant_months: number[] | null;
+  harvest_months: number[] | null;
+  notes: string | null;
 }
 
 // ── UI Config (not plant data) ───────────────────────────────────────────────
@@ -259,8 +288,16 @@ interface Answers {
 const WIZARD_STEPS = [
   { id: "space",      title: "Your Space",      subtitle: "What are you working with?" },
   { id: "experience", title: "Your Experience",  subtitle: "How green is your thumb?" },
+  { id: "zone",       title: "Your Climate",     subtitle: "Where in the world are you?" },
   { id: "plants",     title: "Plant Selection",  subtitle: "What do you want to grow?" },
   { id: "goals",      title: "Your Goals",       subtitle: "What matters most?" },
+];
+
+const ZONE_OPTIONS = [
+  { id: "cold",      icon: "❄️",  title: "Cold Winters",      sub: "Zones 3–5 · Minnesota, Maine, Montana, Wisconsin" },
+  { id: "temperate", icon: "🌤️",  title: "Temperate Climate", sub: "Zones 6–7 · Virginia, Missouri, Pacific NW, New England" },
+  { id: "warm",      icon: "☀️",  title: "Mild & Warm",       sub: "Zones 8–9 · Georgia, Southern CA, Gulf Coast, Texas" },
+  { id: "hot",       icon: "🌴",  title: "Hot & Frost-Free",  sub: "Zones 10–11 · South Florida, Hawaii, Southern CA desert" },
 ];
 
 const SPACE_OPTIONS = [
@@ -285,6 +322,83 @@ const GOAL_OPTIONS = [
 
 function getSpaceLabel(id: string | null): string {
   return SPACE_OPTIONS.find(s => s.id === id)?.title ?? id ?? "";
+}
+
+function getZoneLabel(id: string | null): string {
+  return ZONE_OPTIONS.find(z => z.id === id)?.title ?? id ?? "";
+}
+
+const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function PlantingCalendar({ schedule }: { schedule: PlantSchedule[] }) {
+  const currentMonth = new Date().getMonth() + 1;
+
+  return (
+    <div className="calendar-section">
+      <div className="section-title" style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, marginBottom: 8 }}>Planting Calendar</div>
+      <p style={{ color: "#999", fontSize: 13, marginBottom: 28, fontWeight: 300 }}>When to start seeds, plant outdoors, and harvest — specific to your growing zone</p>
+
+      <div className="calendar-legend">
+        <div className="legend-item">
+          <div className="legend-swatch" style={{ background: "#D4A843" }} />
+          Start seeds indoors
+        </div>
+        <div className="legend-item">
+          <div className="legend-swatch" style={{ background: "#7FB069" }} />
+          Plant / transplant outdoors
+        </div>
+        <div className="legend-item">
+          <div className="legend-swatch" style={{ background: "rgba(74,124,47,0.25)", border: "1px solid rgba(74,124,47,0.3)" }} />
+          Harvest window
+        </div>
+      </div>
+
+      <div className="calendar-grid">
+        <div className="calendar-header-row">
+          <div />
+          {MONTH_NAMES.map((m, i) => (
+            <div key={m} className={`calendar-month-label${i + 1 === currentMonth ? " current" : ""}`}>{m}</div>
+          ))}
+        </div>
+
+        {schedule.map(plant => (
+          <div key={plant.slug} className="calendar-plant-row">
+            <div className="calendar-plant-name">
+              <span>{plant.emoji}</span>
+              <span>{plant.name}</span>
+            </div>
+            {MONTH_NAMES.map((_, i) => {
+              const m = i + 1;
+              const isIndoor  = plant.indoor_start_months?.includes(m);
+              const isOutdoor = plant.outdoor_plant_months?.includes(m);
+              const isHarvest = plant.harvest_months?.includes(m);
+              const isCurrent = m === currentMonth;
+
+              let cls = "calendar-cell";
+              if (isIndoor)       cls += " indoor";
+              else if (isOutdoor) cls += " outdoor";
+              else if (isHarvest) cls += " harvest";
+              else                cls += " empty";
+              if (isCurrent)      cls += " current-month";
+
+              const tip = isIndoor ? "Start indoors" : isOutdoor ? "Plant / transplant outdoors" : isHarvest ? "Harvest window" : "";
+              return <div key={m} className={cls} title={tip} />;
+            })}
+          </div>
+        ))}
+      </div>
+
+      {schedule.some(s => s.notes) && (
+        <div className="calendar-notes">
+          {schedule.filter(s => s.notes).map(s => (
+            <div key={s.slug} style={{ marginBottom: 8 }}>
+              <strong>{s.emoji} {s.name}:</strong> {s.notes}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ── Sub-components ───────────────────────────────────────────────────────────
@@ -433,13 +547,14 @@ function WizardPage({
   onBack: () => void;
 }) {
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({ space: null, experience: null, plants: [], goals: [] });
+  const [answers, setAnswers] = useState<Answers>({ space: null, experience: null, zone: null, plants: [], goals: [] });
 
   function canProceed() {
     if (step === 0) return !!answers.space;
     if (step === 1) return !!answers.experience;
-    if (step === 2) return answers.plants.length > 0;
-    if (step === 3) return answers.goals.length > 0;
+    if (step === 2) return !!answers.zone;
+    if (step === 3) return answers.plants.length > 0;
+    if (step === 4) return answers.goals.length > 0;
     return false;
   }
 
@@ -465,6 +580,7 @@ function WizardPage({
   const tips = [
     "Balcony gardens shine with container-friendly herbs like basil, mint, and thyme.",
     "Even a few hours of sun on a north-facing balcony can support lettuce and herbs.",
+    "Your growing zone determines planting windows — timing is everything.",
     "Mix plants thoughtfully — companion planting reduces pests naturally.",
     "Most herb gardens can sustain a household from just 4–6 plants.",
   ];
@@ -494,7 +610,7 @@ function WizardPage({
 
         {step === 0 && (
           <>
-            <div className="wizard-step-label">Step 1 of 4</div>
+            <div className="wizard-step-label">Step 1 of 5</div>
             <h2 className="wizard-question">What kind of <em>space</em> are you working with?</h2>
             <p className="wizard-desc">This shapes everything — container sizes, plant density, watering frequency, and more.</p>
             <div className="options-grid cols-2">
@@ -512,7 +628,7 @@ function WizardPage({
 
         {step === 1 && (
           <>
-            <div className="wizard-step-label">Step 2 of 4</div>
+            <div className="wizard-step-label">Step 2 of 5</div>
             <h2 className="wizard-question">How would you describe your <em>experience</em>?</h2>
             <p className="wizard-desc">No judgment — we tailor the advice to where you&apos;re at right now.</p>
             <div className="options-grid cols-3">
@@ -530,7 +646,25 @@ function WizardPage({
 
         {step === 2 && (
           <>
-            <div className="wizard-step-label">Step 3 of 4</div>
+            <div className="wizard-step-label">Step 3 of 5</div>
+            <h2 className="wizard-question">What&apos;s your <em>climate?</em></h2>
+            <p className="wizard-desc">This shapes your planting calendar — when to start seeds, plant outdoors, and harvest.</p>
+            <div className="options-grid cols-2">
+              {ZONE_OPTIONS.map(opt => (
+                <div key={opt.id} className={`option-card ${answers.zone === opt.id ? "selected" : ""}`}
+                  onClick={() => { setAnswers(a => ({ ...a, zone: opt.id })); setTimeout(next, 150); }}>
+                  <div className="option-icon">{opt.icon}</div>
+                  <div className="option-title">{opt.title}</div>
+                  <div className="option-sub">{opt.sub}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 3 && (
+          <>
+            <div className="wizard-step-label">Step 4 of 5</div>
             <h2 className="wizard-question">What do you want to <em>grow?</em></h2>
             <p className="wizard-desc">Pick everything you&apos;re interested in — we&apos;ll check compatibility and give tips for each.</p>
             <div className="plant-grid">
@@ -545,9 +679,9 @@ function WizardPage({
           </>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <>
-            <div className="wizard-step-label">Step 4 of 4</div>
+            <div className="wizard-step-label">Step 5 of 5</div>
             <h2 className="wizard-question">What are your <em>goals?</em></h2>
             <p className="wizard-desc">Select all that apply — this helps us prioritize what matters to you.</p>
             <div className="options-grid cols-2">
@@ -577,11 +711,12 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
   const [loading, setLoading] = useState(true);
   const [aiInsight, setAiInsight] = useState("");
   const [plantDetails, setPlantDetails] = useState<PlantDetail[]>([]);
+  const [schedule, setSchedule] = useState<PlantSchedule[]>([]);
 
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [detailsRes, insightRes] = await Promise.all([
+        const [detailsRes, insightRes, scheduleRes] = await Promise.all([
           fetch("/api/plants/details", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -594,11 +729,17 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
               prompt: `A ${answers.experience === "new" ? "beginner" : answers.experience === "some" ? "intermediate" : "experienced"} gardener with a ${getSpaceLabel(answers.space).toLowerCase()} wants to grow: ${answers.plants.join(", ")}. Write a 2-3 sentence personalized garden insight — enthusiastic, specific, actionable. Mention 1-2 of their specific plants. No markdown, no bullet points, pure prose. Keep it warm and encouraging.`,
             }),
           }),
+          fetch("/api/plants/schedule", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slugs: answers.plants, zone: answers.zone }),
+          }),
         ]);
 
-        const [details, insight] = await Promise.all([detailsRes.json(), insightRes.json()]);
+        const [details, insight, sched] = await Promise.all([detailsRes.json(), insightRes.json(), scheduleRes.json()]);
         setPlantDetails(details);
         setAiInsight(insight.text ?? "");
+        setSchedule(sched);
       } catch {
         setAiInsight("Your plant selection is beautifully curated. Follow the guides below and you'll have a thriving garden in no time!");
       } finally {
@@ -677,6 +818,7 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           <div className="results-meta">
             <span className="meta-pill">🏡 {getSpaceLabel(answers.space)}</span>
             <span className="meta-pill">🌱 {answers.experience === "new" ? "Beginner" : answers.experience === "some" ? "Intermediate" : "Experienced"}</span>
+            {answers.zone && <span className="meta-pill">🌍 {getZoneLabel(answers.zone)}</span>}
             {answers.goals.map(g => {
               const gl = GOAL_OPTIONS.find(o => o.id === g);
               return gl ? <span key={g} className="meta-pill">{gl.icon} {gl.title}</span> : null;
@@ -710,6 +852,8 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
             <div className="overview-value">{plantDetails.some(p => p.difficulty === "moderate") ? "Easy to Moderate" : "All Easy"}</div>
           </div>
         </div>
+
+        {schedule.length > 0 && <PlantingCalendar schedule={schedule} />}
 
         <div className="section-header">
           <div className="section-title">Plant-by-Plant Guide</div>
