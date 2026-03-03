@@ -616,7 +616,7 @@ function WizardPage({
             <div className="options-grid cols-2">
               {SPACE_OPTIONS.map(opt => (
                 <div key={opt.id} className={`option-card ${answers.space === opt.id ? "selected" : ""}`}
-                  onClick={() => { setAnswers(a => ({ ...a, space: opt.id })); setTimeout(next, 150); }}>
+                  onClick={() => { setAnswers(a => ({ ...a, space: opt.id })); setStep(s => s + 1); }}>
                   <div className="option-icon">{opt.icon}</div>
                   <div className="option-title">{opt.title}</div>
                   <div className="option-sub">{opt.sub}</div>
@@ -634,7 +634,7 @@ function WizardPage({
             <div className="options-grid cols-3">
               {EXPERIENCE_OPTIONS.map(opt => (
                 <div key={opt.id} className={`option-card ${answers.experience === opt.id ? "selected" : ""}`}
-                  onClick={() => { setAnswers(a => ({ ...a, experience: opt.id })); setTimeout(next, 150); }}>
+                  onClick={() => { setAnswers(a => ({ ...a, experience: opt.id })); setStep(s => s + 1); }}>
                   <div className="option-icon">{opt.icon}</div>
                   <div className="option-title">{opt.title}</div>
                   <div className="option-sub">{opt.sub}</div>
@@ -652,7 +652,7 @@ function WizardPage({
             <div className="options-grid cols-2">
               {ZONE_OPTIONS.map(opt => (
                 <div key={opt.id} className={`option-card ${answers.zone === opt.id ? "selected" : ""}`}
-                  onClick={() => { setAnswers(a => ({ ...a, zone: opt.id })); setTimeout(next, 150); }}>
+                  onClick={() => { setAnswers(a => ({ ...a, zone: opt.id })); setStep(s => s + 1); }}>
                   <div className="option-icon">{opt.icon}</div>
                   <div className="option-title">{opt.title}</div>
                   <div className="option-sub">{opt.sub}</div>
