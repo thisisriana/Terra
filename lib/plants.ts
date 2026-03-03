@@ -5,6 +5,42 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+export async function getPlantingSchedule(slugs: string[], zoneGroup: string) {
+  if (slugs.length === 0) return [];
+
+  const { data: plants, error: plantsError } = await supabase
+    .from("plants")
+    .select("id, slug, name, emoji")
+    .in("slug", slugs);
+  if (plantsError) throw plantsError;
+  if (!plants || plants.length === 0) return [];
+
+  const plantIds = plants.map((p) => p.id);
+
+  const { data: schedules, error: schedError } = await supabase
+    .from("plant_planting_schedule")
+    .select("plant_id, indoor_start_months, outdoor_plant_months, harvest_months, notes")
+    .in("plant_id", plantIds)
+    .eq("zone_group_id", zoneGroup);
+  if (schedError) throw schedError;
+
+  const schedMap = Object.fromEntries(
+    (schedules ?? []).map((s) => [s.plant_id, s])
+  );
+
+  return plants.map((p) => ({
+    slug: p.slug,
+    name: p.name,
+    emoji: p.emoji,
+    ...(schedMap[p.id] ?? {
+      indoor_start_months: null,
+      outdoor_plant_months: null,
+      harvest_months: null,
+      notes: null,
+    }),
+  }));
+}
+
 export async function getAllPlants() {
   const { data, error } = await supabase
     .from("plants")
