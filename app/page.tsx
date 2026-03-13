@@ -68,7 +68,7 @@ const STYLES = `
   .stat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(245,240,232,0.4); margin-top: 2px; }
   .hero-image-col { position: absolute; right: 0; top: 0; bottom: 0; width: 42%; z-index: 5; display: flex; flex-direction: column; }
   .hero-img-panel { flex: 1; background: linear-gradient(135deg, #7A3628 0%, #C46442 40%, #D4876A 100%); position: relative; overflow: hidden; }
-  .hero-img-panel::after { content: '🌿'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 120px; opacity: 0.15; }
+  .hero-img-panel::after { content: ''; position: absolute; inset: 0; }
   .img-caption { padding: 16px 24px; background: var(--terra); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--cream); font-weight: 500; }
 
   .features-strip { background: var(--warm-white); padding: 80px 48px; border-top: 1px solid rgba(122,54,40,0.1); }
@@ -113,13 +113,17 @@ const STYLES = `
   .option-title { font-size: 15px; font-weight: 600; color: var(--dark); }
   .option-sub { font-size: 12px; color: #888; margin-top: 4px; font-weight: 300; }
 
-  .plant-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 44px; }
-  .plant-chip { border: 1.5px solid rgba(122,54,40,0.12); padding: 14px 12px; cursor: pointer; text-align: center; background: var(--warm-white); transition: all 0.2s; }
-  .plant-chip:hover { border-color: var(--terra-light); }
-  .plant-chip.selected { border-color: var(--terra-dark); background: rgba(122,54,40,0.05); }
-  .plant-chip .plant-emoji { font-size: 24px; display: block; margin-bottom: 6px; }
-  .plant-chip .plant-name { font-size: 11px; font-weight: 500; color: var(--dark); }
-  .plant-chip.selected .plant-name { color: var(--terra-dark); }
+  .plant-search-wrapper { margin-bottom: 44px; }
+  .plant-search-box { position: relative; }
+  .plant-search-input { width: 100%; padding: 14px 18px; font-size: 15px; border: 1.5px solid rgba(122,54,40,0.2); background: var(--warm-white); color: var(--dark); outline: none; font-family: inherit; box-sizing: border-box; }
+  .plant-search-input:focus { border-color: var(--terra-dark); }
+  .plant-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--warm-white); border: 1.5px solid rgba(122,54,40,0.2); border-top: none; max-height: 220px; overflow-y: auto; z-index: 100; }
+  .plant-dropdown-item { padding: 12px 18px; font-size: 14px; color: var(--dark); cursor: pointer; }
+  .plant-dropdown-item:hover { background: rgba(122,54,40,0.06); color: var(--terra-dark); }
+  .plant-dropdown-empty { padding: 12px 18px; font-size: 14px; color: #999; }
+  .plant-selected-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .plant-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(122,54,40,0.08); border: 1.5px solid rgba(122,54,40,0.2); font-size: 13px; color: var(--terra-dark); font-weight: 500; }
+  .plant-tag-remove { background: none; border: none; cursor: pointer; font-size: 16px; line-height: 1; color: var(--terra-light); padding: 0; }
 
   .wizard-nav { display: flex; gap: 12px; align-items: center; }
   .btn-next { background: var(--dark); color: var(--cream); border: none; padding: 14px 36px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.5px; transition: all 0.2s; }
@@ -294,30 +298,30 @@ const WIZARD_STEPS = [
 ];
 
 const ZONE_OPTIONS = [
-  { id: "cold",      icon: "❄️",  title: "Cold Winters",      sub: "Zones 3–5 · Minnesota, Maine, Montana, Wisconsin" },
-  { id: "temperate", icon: "🌤️",  title: "Temperate Climate", sub: "Zones 6–7 · Virginia, Missouri, Pacific NW, New England" },
-  { id: "warm",      icon: "☀️",  title: "Mild & Warm",       sub: "Zones 8–9 · Georgia, Southern CA, Gulf Coast, Texas" },
-  { id: "hot",       icon: "🌴",  title: "Hot & Frost-Free",  sub: "Zones 10–11 · South Florida, Hawaii, Southern CA desert" },
+  { id: "cold",      icon: null, title: "Cold Winters",      sub: "Zones 3–5 · Minnesota, Maine, Montana, Wisconsin" },
+  { id: "temperate", icon: null, title: "Temperate Climate", sub: "Zones 6–7 · Virginia, Missouri, Pacific NW, New England" },
+  { id: "warm",      icon: null, title: "Mild & Warm",       sub: "Zones 8–9 · Georgia, Southern CA, Gulf Coast, Texas" },
+  { id: "hot",       icon: null, title: "Hot & Frost-Free",  sub: "Zones 10–11 · South Florida, Hawaii, Southern CA desert" },
 ];
 
 const SPACE_OPTIONS = [
-  { id: "balcony",    icon: "🏙️", title: "Balcony / Patio",    sub: "Container gardening, limited sq footage" },
-  { id: "raised_bed", icon: "🪴", title: "Raised Beds",         sub: "Dedicated beds, more control" },
-  { id: "small_yard", icon: "🌱", title: "Small Yard",          sub: "Up to 1,000 sq ft of growing space" },
-  { id: "large_yard", icon: "🌳", title: "Large Yard / Plot",   sub: "1/4 acre or more" },
+  { id: "balcony",    icon: null, title: "Balcony / Patio",    sub: "Container gardening, limited sq footage" },
+  { id: "raised_bed", icon: null, title: "Raised Beds",         sub: "Dedicated beds, more control" },
+  { id: "small_yard", icon: null, title: "Small Yard",          sub: "Up to 1,000 sq ft of growing space" },
+  { id: "large_yard", icon: null, title: "Large Yard / Plot",   sub: "1/4 acre or more" },
 ];
 
 const EXPERIENCE_OPTIONS = [
-  { id: "new",       icon: "🌱", title: "Complete Beginner",  sub: "Never grown anything" },
-  { id: "some",      icon: "🌿", title: "Some Experience",    sub: "A few seasons under my belt" },
-  { id: "confident", icon: "🌳", title: "Confident Gardener", sub: "Know my way around a garden" },
+  { id: "new",       icon: null, title: "Complete Beginner",  sub: "Never grown anything" },
+  { id: "some",      icon: null, title: "Some Experience",    sub: "A few seasons under my belt" },
+  { id: "confident", icon: null, title: "Confident Gardener", sub: "Know my way around a garden" },
 ];
 
 const GOAL_OPTIONS = [
-  { id: "eat",       icon: "🍽️", title: "Grow food to eat" },
-  { id: "beauty",    icon: "🌸", title: "Beautiful outdoor space" },
-  { id: "learn",     icon: "📚", title: "Learn & experiment" },
-  { id: "wellness",  icon: "🧘", title: "Therapeutic & mindful" },
+  { id: "eat",       icon: null, title: "Grow food to eat" },
+  { id: "beauty",    icon: null, title: "Beautiful outdoor space" },
+  { id: "learn",     icon: null, title: "Learn & experiment" },
+  { id: "wellness",  icon: null, title: "Therapeutic & mindful" },
 ];
 
 function getSpaceLabel(id: string | null): string {
@@ -405,8 +409,8 @@ function PlantingCalendar({ schedule }: { schedule: PlantSchedule[] }) {
 
 function SunBadge({ type }: { type: string }) {
   return type === "full"
-    ? <span className="badge badge-sun">☀ Full Sun</span>
-    : <span className="badge badge-part">⛅ Part Sun</span>;
+    ? <span className="badge badge-sun">Full Sun</span>
+    : <span className="badge badge-part">Part Sun</span>;
 }
 
 function DiffBadge({ level }: { level: string }) {
@@ -429,7 +433,7 @@ function PlantRow({ plant }: { plant: PlantDetail }) {
   return (
     <div className={`plant-row ${open ? "expanded" : ""}`}>
       <div className="plant-row-header" onClick={() => setOpen(!open)}>
-        <span className="plant-row-emoji">{plant.emoji}</span>
+
         <div className="plant-row-info">
           <div className="plant-row-name">{plant.name}</div>
           <div className="plant-row-tagline">{plant.tagline}</div>
@@ -443,15 +447,15 @@ function PlantRow({ plant }: { plant: PlantDetail }) {
 
       <div className="plant-details">
         <div className="detail-block">
-          <div className="detail-block-label">☀ Light Requirements</div>
+          <div className="detail-block-label">Light Requirements</div>
           <div className="detail-block-content">{plant.light_description}</div>
         </div>
         <div className="detail-block">
-          <div className="detail-block-label">💧 Watering</div>
+          <div className="detail-block-label">Watering</div>
           <div className="detail-block-content">{plant.water_description}</div>
         </div>
         <div className="detail-block">
-          <div className="detail-block-label">🌍 Soil Composition</div>
+          <div className="detail-block-label">Soil Composition</div>
           <div className="detail-block-content">
             {plant.soil_description}
             {plant.ph_min && plant.ph_max && (
@@ -460,7 +464,7 @@ function PlantRow({ plant }: { plant: PlantDetail }) {
           </div>
         </div>
         <div className="detail-block">
-          <div className="detail-block-label">🤝 Companion Plants</div>
+          <div className="detail-block-label">Companion Plants</div>
           <div className="detail-block-content">
             {beneficial.length > 0 && <><strong>Grows well with: </strong>{beneficial.join(", ")}<br /></>}
             {harmful.length > 0 && <><strong>Keep away from: </strong>{harmful.join(", ")}</>}
@@ -468,7 +472,7 @@ function PlantRow({ plant }: { plant: PlantDetail }) {
           </div>
         </div>
         <div className="detail-block full-width">
-          <div className="detail-block-label">💡 Pro Tips</div>
+          <div className="detail-block-label">Pro Tips</div>
           <div className="detail-block-content">
             <ul>
               {plant.plant_tips.map((t, i) => <li key={i}>{t.tip}</li>)}
@@ -482,7 +486,7 @@ function PlantRow({ plant }: { plant: PlantDetail }) {
 
 // ── Pages ────────────────────────────────────────────────────────────────────
 
-function HomePage({ onStart }: { onStart: () => void }) {
+function HomePage({ onStart, onGuides }: { onStart: () => void; onGuides: () => void }) {
   return (
     <div className="page">
       <div className="hero">
@@ -491,7 +495,7 @@ function HomePage({ onStart }: { onStart: () => void }) {
         <nav className="nav">
           <div className="nav-logo">Terra<span>.</span></div>
           <div className="nav-links">
-            <a>Guides</a>
+            <a style={{ cursor: "pointer" }} onClick={onGuides}>Guides</a>
             <a>Community</a>
             <a onClick={onStart}>Plan My Garden</a>
           </div>
@@ -519,17 +523,14 @@ function HomePage({ onStart }: { onStart: () => void }) {
         <div className="section-label">Why Terra</div>
         <div className="features-grid">
           <div className="feature-card">
-            <div className="feature-icon">🧭</div>
             <div className="feature-title">Guided Planning</div>
             <div className="feature-desc">Answer a few questions about your space, experience, and goals. We&apos;ll build a personalized garden plan around you.</div>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🌱</div>
             <div className="feature-title">Deep Plant Knowledge</div>
             <div className="feature-desc">Light, water, soil composition, companion planting, seasonal tips — every detail you need, curated for real gardeners.</div>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🏙️</div>
             <div className="feature-title">Any Space Works</div>
             <div className="feature-desc">Balcony with 4 pots or a half-acre backyard. Container gardening to in-ground beds. We cover it all, at every level.</div>
           </div>
@@ -548,6 +549,8 @@ function WizardPage({
 }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({ space: null, experience: null, zone: null, plants: [], goals: [] });
+  const [plantSearch, setPlantSearch] = useState("");
+  const [plantDropdownOpen, setPlantDropdownOpen] = useState(false);
 
   function canProceed() {
     if (step === 0) return !!answers.space;
@@ -617,7 +620,7 @@ function WizardPage({
               {SPACE_OPTIONS.map(opt => (
                 <div key={opt.id} className={`option-card ${answers.space === opt.id ? "selected" : ""}`}
                   onClick={() => { setAnswers(a => ({ ...a, space: opt.id })); setStep(s => s + 1); }}>
-                  <div className="option-icon">{opt.icon}</div>
+
                   <div className="option-title">{opt.title}</div>
                   <div className="option-sub">{opt.sub}</div>
                 </div>
@@ -635,7 +638,7 @@ function WizardPage({
               {EXPERIENCE_OPTIONS.map(opt => (
                 <div key={opt.id} className={`option-card ${answers.experience === opt.id ? "selected" : ""}`}
                   onClick={() => { setAnswers(a => ({ ...a, experience: opt.id })); setStep(s => s + 1); }}>
-                  <div className="option-icon">{opt.icon}</div>
+
                   <div className="option-title">{opt.title}</div>
                   <div className="option-sub">{opt.sub}</div>
                 </div>
@@ -653,7 +656,7 @@ function WizardPage({
               {ZONE_OPTIONS.map(opt => (
                 <div key={opt.id} className={`option-card ${answers.zone === opt.id ? "selected" : ""}`}
                   onClick={() => { setAnswers(a => ({ ...a, zone: opt.id })); setStep(s => s + 1); }}>
-                  <div className="option-icon">{opt.icon}</div>
+
                   <div className="option-title">{opt.title}</div>
                   <div className="option-sub">{opt.sub}</div>
                 </div>
@@ -666,15 +669,47 @@ function WizardPage({
           <>
             <div className="wizard-step-label">Step 4 of 5</div>
             <h2 className="wizard-question">What do you want to <em>grow?</em></h2>
-            <p className="wizard-desc">Pick everything you&apos;re interested in — we&apos;ll check compatibility and give tips for each.</p>
-            <div className="plant-grid">
-              {allPlants.map(p => (
-                <div key={p.slug} className={`plant-chip ${answers.plants.includes(p.slug) ? "selected" : ""}`}
-                  onClick={() => togglePlant(p.slug)}>
-                  <span className="plant-emoji">{p.emoji}</span>
-                  <span className="plant-name">{p.name}</span>
+            <p className="wizard-desc">Search and select everything you&apos;re interested in — we&apos;ll check compatibility and give tips for each.</p>
+            <div className="plant-search-wrapper">
+              <div className="plant-search-box">
+                <input
+                  className="plant-search-input"
+                  type="text"
+                  placeholder="Search plants..."
+                  value={plantSearch}
+                  onChange={e => { setPlantSearch(e.target.value); setPlantDropdownOpen(true); }}
+                  onFocus={() => setPlantDropdownOpen(true)}
+                  onBlur={() => setTimeout(() => setPlantDropdownOpen(false), 150)}
+                  autoComplete="off"
+                />
+                {plantDropdownOpen && (
+                  <div className="plant-dropdown">
+                    {allPlants
+                      .filter(p => p.name.toLowerCase().includes(plantSearch.toLowerCase()) && !answers.plants.includes(p.slug))
+                      .map(p => (
+                        <div key={p.slug} className="plant-dropdown-item" onMouseDown={() => { togglePlant(p.slug); setPlantSearch(""); }}>
+                          {p.name}
+                        </div>
+                      ))}
+                    {allPlants.filter(p => p.name.toLowerCase().includes(plantSearch.toLowerCase()) && !answers.plants.includes(p.slug)).length === 0 && (
+                      <div className="plant-dropdown-empty">No plants found</div>
+                    )}
+                  </div>
+                )}
+              </div>
+              {answers.plants.length > 0 && (
+                <div className="plant-selected-tags">
+                  {answers.plants.map(slug => {
+                    const p = allPlants.find(x => x.slug === slug);
+                    return p ? (
+                      <span key={slug} className="plant-tag">
+                        {p.name}
+                        <button className="plant-tag-remove" onClick={() => togglePlant(slug)}>×</button>
+                      </span>
+                    ) : null;
+                  })}
                 </div>
-              ))}
+              )}
             </div>
           </>
         )}
@@ -688,7 +723,7 @@ function WizardPage({
               {GOAL_OPTIONS.map(opt => (
                 <div key={opt.id} className={`option-card ${answers.goals.includes(opt.id) ? "selected" : ""}`}
                   onClick={() => toggleGoal(opt.id)}>
-                  <div className="option-icon">{opt.icon}</div>
+
                   <div className="option-title">{opt.title}</div>
                 </div>
               ))}
@@ -726,7 +761,11 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              prompt: `A ${answers.experience === "new" ? "beginner" : answers.experience === "some" ? "intermediate" : "experienced"} gardener with a ${getSpaceLabel(answers.space).toLowerCase()} wants to grow: ${answers.plants.join(", ")}. Write a 2-3 sentence personalized garden insight — enthusiastic, specific, actionable. Mention 1-2 of their specific plants. No markdown, no bullet points, pure prose. Keep it warm and encouraging.`,
+              prompt: answers.experience === "new"
+                ? `A complete beginner gardener with a ${getSpaceLabel(answers.space).toLowerCase()} is starting their first garden with: ${answers.plants.join(", ")}. Write 2-3 sentences of warm, encouraging advice tailored to a first-timer. Focus on: one simple thing to start with, what to watch for as a beginner, and a reassuring note that they can do this. Be specific to 1-2 of their plants. No markdown, no bullet points, pure prose.`
+                : answers.experience === "some"
+                ? `A gardener with a few seasons of experience has a ${getSpaceLabel(answers.space).toLowerCase()} and wants to grow: ${answers.plants.join(", ")}. Write 2-3 sentences of practical, intermediate-level advice. Focus on: how to get better results than last season, an optimization tip specific to their plant mix, and what to pay attention to this time around. Mention 1-2 of their specific plants. No markdown, no bullet points, pure prose.`
+                : `An experienced, confident gardener with a ${getSpaceLabel(answers.space).toLowerCase()} is planning to grow: ${answers.plants.join(", ")}. Write 2-3 sentences of concise, advanced gardening insight. Focus on: maximizing yield or aesthetics, a nuanced technique for their plant combination, or a pro-level consideration for their space. Skip the basics — they know them. Mention 1-2 of their plants specifically. No markdown, no bullet points, pure prose.`,
             }),
           }),
           fetch("/api/plants/schedule", {
@@ -800,6 +839,18 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
   });
   const compatibleGroups = Object.values(groupMap).filter(g => g.length >= 2);
 
+  // Sort plants by difficulty for beginners (easy first), keep original order otherwise
+  const sortedPlants = answers.experience === "new"
+    ? [...plantDetails].sort((a, b) => {
+        if (a.difficulty === b.difficulty) return 0;
+        return a.difficulty === "easy" ? -1 : 1;
+      })
+    : plantDetails;
+
+  const moderatePlantsForBeginner = answers.experience === "new"
+    ? plantDetails.filter(p => p.difficulty === "moderate").map(p => p.name)
+    : [];
+
   return (
     <div className="results-page">
       <div className="results-hero">
@@ -816,12 +867,12 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
             <em>{plantDetails.length} plants</em> for your<br />{getSpaceLabel(answers.space)}
           </h1>
           <div className="results-meta">
-            <span className="meta-pill">🏡 {getSpaceLabel(answers.space)}</span>
-            <span className="meta-pill">🌱 {answers.experience === "new" ? "Beginner" : answers.experience === "some" ? "Intermediate" : "Experienced"}</span>
-            {answers.zone && <span className="meta-pill">🌍 {getZoneLabel(answers.zone)}</span>}
+            <span className="meta-pill">{getSpaceLabel(answers.space)}</span>
+            <span className="meta-pill">{answers.experience === "new" ? "Beginner" : answers.experience === "some" ? "Intermediate" : "Experienced"}</span>
+            {answers.zone && <span className="meta-pill">{getZoneLabel(answers.zone)}</span>}
             {answers.goals.map(g => {
               const gl = GOAL_OPTIONS.find(o => o.id === g);
-              return gl ? <span key={g} className="meta-pill">{gl.icon} {gl.title}</span> : null;
+              return gl ? <span key={g} className="meta-pill">{gl.title}</span> : null;
             })}
           </div>
         </div>
@@ -830,7 +881,7 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
       <div className="results-body">
         {aiInsight && (
           <div style={{ background: "rgba(122,54,40,0.06)", borderLeft: "3px solid var(--terra-light)", padding: "24px 28px", marginBottom: 48, fontFamily: "'Playfair Display', serif", fontSize: 18, fontStyle: "italic", color: "var(--dark)", lineHeight: 1.7 }}>
-            ✦ {aiInsight}
+            {aiInsight}
           </div>
         )}
 
@@ -849,9 +900,25 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           </div>
           <div className="overview-card">
             <div className="overview-label">Difficulty Range</div>
-            <div className="overview-value">{plantDetails.some(p => p.difficulty === "moderate") ? "Easy to Moderate" : "All Easy"}</div>
+            <div className="overview-value">
+              {plantDetails.some(p => p.difficulty === "moderate")
+                ? answers.experience === "new" ? "Mostly Easy + 1–2 Moderate" : "Easy to Moderate"
+                : "All Easy"}
+            </div>
           </div>
         </div>
+
+        {moderatePlantsForBeginner.length > 0 && (
+          <div style={{ background: "rgba(212,168,67,0.1)", border: "1px solid rgba(212,168,67,0.35)", padding: "18px 24px", marginBottom: 32, display: "flex", gap: 14, alignItems: "flex-start" }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>★</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--dark)", marginBottom: 4 }}>A couple of your picks need a little extra attention</div>
+              <div style={{ fontSize: 13, color: "#555", fontWeight: 300, lineHeight: 1.6 }}>
+                <strong>{moderatePlantsForBeginner.join(" and ")}</strong> {moderatePlantsForBeginner.length === 1 ? "is" : "are"} rated moderate difficulty — totally doable as a beginner, but worth reading the guide carefully. We&apos;ve listed your easier plants first below.
+              </div>
+            </div>
+          </div>
+        )}
 
         {schedule.length > 0 && <PlantingCalendar schedule={schedule} />}
 
@@ -859,8 +926,18 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           <div className="section-title">Plant-by-Plant Guide</div>
           <div className="section-count">{plantDetails.length} plants — click to expand</div>
         </div>
+        {answers.experience === "new" && (
+          <div style={{ fontSize: 13, color: "#888", marginBottom: 20, fontWeight: 300 }}>
+            New to gardening? Start with the easy-rated plants and get comfortable before tackling anything more involved.
+          </div>
+        )}
+        {answers.experience === "confident" && (
+          <div style={{ fontSize: 13, color: "#888", marginBottom: 20, fontWeight: 300 }}>
+            Advanced tips and companion strategies are highlighted in each guide below.
+          </div>
+        )}
         <div className="plants-list">
-          {plantDetails.map(p => <PlantRow key={p.slug} plant={p} />)}
+          {sortedPlants.map(p => <PlantRow key={p.slug} plant={p} />)}
         </div>
 
         {(compatibleGroups.length > 0 || harmfulPairs.length > 0) && (
@@ -934,6 +1011,265 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
   );
 }
 
+// ── Guides Data ──────────────────────────────────────────────────────────────
+
+const ZONE_GUIDES = [
+  {
+    id: "cold",
+    label: "Cold Winters",
+    zones: "Zones 3–5",
+    examples: "Minnesota, Maine, Montana, Wisconsin",
+    emoji: "❄️",
+    season: "90–120 days",
+    lastFrost: "Late May – mid June",
+    firstFrost: "Early–mid September",
+    tagline: "Short but mighty. Every week counts.",
+    intro: "Cold-climate gardening is all about working with a compressed timeline. Your soil thaws late and freezes early — but with the right crops and a few season-extension tricks, you can grow more than most people expect.",
+    tips: [
+      { title: "Start indoors early", body: "Begin seeds 8–10 weeks before your last frost (around late March). Tomatoes, peppers, and brassicas all benefit from an early indoor start. Don't rush them outdoors — cold soil slows growth dramatically." },
+      { title: "Use row covers and cold frames", body: "A simple frost cloth or cold frame can add 3–4 weeks to each end of your season. This turns a 100-day season into a 130-day one — enough to ripen full-size tomatoes." },
+      { title: "Choose short-season varieties", body: "Look for 'days to maturity' under 70 for warm-season crops. Varieties like Stupice tomato (52 days) or Early Jalapeño were bred for climates like yours." },
+      { title: "Lean into cold-hardy crops", body: "Kale, spinach, peas, and root vegetables don't just survive cold — they thrive in it. Frost actually sweetens kale and carrots. These are your most reliable performers." },
+      { title: "Mulch after first frost", body: "Once temperatures drop, add 4–6 inches of mulch over perennial beds, garlic, and strawberries. It insulates roots through deep freezes and retains spring moisture." },
+    ],
+    rhythm: [
+      { period: "March – April", action: "Start seeds indoors: tomatoes, peppers, brassicas, herbs" },
+      { period: "May (after last frost)", action: "Direct sow peas, spinach, carrots, beets; transplant cold-tolerant starts" },
+      { period: "June 1+", action: "Transplant warm-season crops outdoors after soil reaches 60°F" },
+      { period: "July – August", action: "Peak growing season; sow fall crops (kale, turnips, radishes) in late July" },
+      { period: "September", action: "Harvest warm crops before first frost; cold-hardy greens continue" },
+      { period: "October", action: "Last harvest window; plant garlic for next spring" },
+    ],
+    bestPlants: ["Kale", "Spinach", "Peas", "Carrots", "Beets", "Radishes", "Broccoli", "Cabbage", "Potatoes", "Garlic", "Chives", "Short-season tomatoes", "Cold-hardy strawberries"],
+    avoid: "Long-season crops (butternut squash, late peppers), frost-sensitive herbs like basil (without protection), tropical plants.",
+    color: "#5B7FA6",
+  },
+  {
+    id: "temperate",
+    label: "Temperate Climate",
+    zones: "Zones 6–7",
+    examples: "Virginia, Missouri, Pacific NW, New England",
+    emoji: "🌿",
+    season: "150–180 days",
+    lastFrost: "Mid-March to mid-April",
+    firstFrost: "Mid-October to mid-November",
+    tagline: "Two full seasons. The sweet spot for most gardeners.",
+    intro: "Temperate zones have a forgiving, generous growing season with distinct spring and fall windows. This is the most versatile climate for gardening — nearly everything grows here. The main challenge is planning both seasons well.",
+    tips: [
+      { title: "Plant twice: spring and fall", body: "You have two distinct growing windows. Direct sow cool-season crops (lettuce, spinach, peas) 4–6 weeks before your last frost in spring, then again in late July for fall harvest." },
+      { title: "Succession plant for continuous harvest", body: "Sow lettuce, radishes, and beans every 2–3 weeks instead of all at once. This prevents a glut followed by nothing — you'll harvest continuously for months." },
+      { title: "Watch for late spring frosts", body: "Frost can sneak in through mid-April in zone 6. Keep a frost cloth handy and check the 10-day forecast before transplanting warm-season crops outside." },
+      { title: "Manage humidity and airflow", body: "Humid summers invite powdery mildew, blight, and fungal issues. Space plants generously, prune lower leaves, and water at the base — never overhead — to keep foliage dry." },
+      { title: "Plant garlic in fall", body: "October is the perfect time to plant garlic in temperate zones. It overwinters in the ground and gives you an early July harvest — one of the easiest and most rewarding crops." },
+    ],
+    rhythm: [
+      { period: "February – March", action: "Start tomatoes, peppers, eggplant indoors; direct sow cool crops outdoors when soil is workable" },
+      { period: "April – May", action: "Transplant brassicas; direct sow beans, carrots, beets after last frost" },
+      { period: "May – June", action: "Transplant tomatoes, peppers, cucumbers after frost-free; plant squash and corn" },
+      { period: "July – August", action: "Peak summer harvest; sow fall brassicas, greens, and carrots in late July" },
+      { period: "September – October", action: "Fall harvest window; lettuce, spinach, kale thrive in cooling temps" },
+      { period: "October", action: "Plant garlic; add compost and cover crop bare beds before winter" },
+    ],
+    bestPlants: ["Tomatoes", "Peppers", "Cucumbers", "Squash", "Beans", "Peas", "Lettuce", "Kale", "Broccoli", "Garlic", "Strawberries", "Blueberries", "Most herbs"],
+    avoid: "Tropical crops (banana, papaya) won't survive winter. Very long-season crops may not fully mature if planted late.",
+    color: "#5A8C5A",
+  },
+  {
+    id: "warm",
+    label: "Mild & Warm",
+    zones: "Zones 8–9",
+    examples: "Georgia, Southern CA, Gulf Coast, Texas",
+    emoji: "☀️",
+    season: "200–240 days",
+    lastFrost: "Mid-February to mid-March",
+    firstFrost: "November – December",
+    tagline: "Two harvests, one challenge: surviving summer.",
+    intro: "Warm zones offer an incredibly long season, but summer heat is your biggest obstacle — not cold. The most productive approach is to think in two seasons: a spring push before the heat arrives, and a fall/winter garden when temperatures drop back into the sweet spot.",
+    tips: [
+      { title: "Plant tomatoes early — February or March", body: "Get tomatoes in the ground early so they can fruit and finish before summer heat tops 90°F. Heat causes blossom drop and stops fruit set. An early start means a full harvest by June." },
+      { title: "Use shade cloth in summer", body: "A 30–50% shade cloth over vulnerable crops in July–August can drop soil temps by 10°F and prevent leaf scorch. This is the single most useful tool for warm-zone gardeners." },
+      { title: "Fall is your best season", body: "September through February is often the most productive time of year. Soil is warm (seeds germinate fast), pests decline, and cool temps are ideal for brassicas, greens, root vegetables, and herbs." },
+      { title: "Water deeply, not frequently", body: "Train roots to go deep by watering thoroughly 1–2 times per week rather than a little every day. Deep roots are more drought-tolerant. Mulch 3–4 inches thick to hold moisture." },
+      { title: "Plant garlic in November", body: "Unlike northern zones, garlic is planted in fall here and harvested in late spring. It's one of the easiest and most productive crops in warm climates." },
+    ],
+    rhythm: [
+      { period: "February – March", action: "Plant tomatoes, peppers, squash; last chance for cool-season crops" },
+      { period: "April – June", action: "Peak warm-season harvest; plant sweet potatoes and okra in May" },
+      { period: "July – August", action: "Heat pause — shade cloth, drought-tolerant plants, minimal activity" },
+      { period: "September – October", action: "Best planting window: brassicas, greens, carrots, beets, herbs" },
+      { period: "November – December", action: "Plant garlic and onions; cool-season crops fully established" },
+      { period: "January – February", action: "Winter harvest of greens, root veg; start tomatoes and peppers indoors" },
+    ],
+    bestPlants: ["Tomatoes (early season)", "Peppers", "Okra", "Sweet potatoes", "Eggplant", "Figs", "Blueberries", "Garlic", "Brassicas (fall)", "Citrus", "Herbs year-round", "Sweet corn"],
+    avoid: "Don't plant cool-season crops in late spring — they'll bolt immediately. Avoid planting heat-sensitive crops (lettuce, spinach) from May to August.",
+    color: "#C47C2A",
+  },
+  {
+    id: "hot",
+    label: "Hot & Frost-Free",
+    zones: "Zones 10–11",
+    examples: "South Florida, Hawaii, Southern CA desert",
+    emoji: "🌴",
+    season: "Year-round (no frost)",
+    lastFrost: "None",
+    firstFrost: "None",
+    tagline: "No frost, no rules — but summer heat demands respect.",
+    intro: "Frost-free zones sound like paradise, but tropical heat and year-round pest pressure require a different kind of strategy. The secret is knowing which crops belong in which season — counterintuitively, your coolest months (October–March) are the best time for most vegetables.",
+    tips: [
+      { title: "Grow cool-season vegetables Oct–March", body: "Tomatoes, peppers, and most vegetables grow best in your 'winter.' The cooler temperatures reduce stress, pests, and disease. Don't fight the summer — plant tropicals then instead." },
+      { title: "Lean into tropical edibles year-round", body: "Bananas, papayas, lemongrass, moringa, sweet potatoes, and tropical herbs (basil, turmeric, ginger) are made for your climate. These give you productive growing even in the hottest months." },
+      { title: "Manage pests proactively", body: "Warm year-round conditions mean pest populations never crash in winter. Inspect plants weekly, remove eggs and larvae early, and rotate crops seasonally to disrupt pest cycles." },
+      { title: "Afternoon shade is critical in desert zones", body: "In Phoenix, Palm Springs, or similar areas, plants need protection from the intense afternoon sun (2–6pm). Growing on the east side of a wall, fence, or tree can make all the difference." },
+      { title: "Water consistently — brief drought causes real damage", body: "Plants under heat stress have no buffer. Missing a watering in peak summer can cause irreversible damage within hours. Drip irrigation on a timer is the most reliable solution." },
+    ],
+    rhythm: [
+      { period: "October – November", action: "Plant tomatoes, peppers, squash, beans, herbs — your main growing season begins" },
+      { period: "December – January", action: "Brassicas, lettuce, carrots, beets thrive in cool temperatures; plant citrus" },
+      { period: "February – March", action: "Peak cool-season harvest; start tropical edibles for summer" },
+      { period: "April – May", action: "Transition to heat-tolerant crops: okra, sweet potatoes, tropical herbs" },
+      { period: "June – September", action: "Focus on tropicals: banana, papaya, lemongrass, moringa; minimal veggie gardening" },
+      { period: "October", action: "Cycle restarts — soil prep, compost, and replant for cool season" },
+    ],
+    bestPlants: ["Tomatoes (Oct–March)", "Peppers", "Okra", "Sweet potatoes", "Banana", "Papaya", "Citrus", "Avocado", "Lemongrass", "Basil", "Turmeric & ginger", "Moringa", "Chiles"],
+    avoid: "Don't plant cool-season crops (lettuce, spinach, broccoli) in summer — they'll immediately bolt or die from heat stress. Avoid frost-sensitive tropicals in marginal zone 10 areas that occasionally dip below 30°F.",
+    color: "#C4622D",
+  },
+];
+
+function GuidesPage({ onHome }: { onHome: () => void }) {
+  const [activeZone, setActiveZone] = useState("cold");
+  const guide = ZONE_GUIDES.find(g => g.id === activeZone)!;
+
+  return (
+    <div className="page" style={{ minHeight: "100vh", background: "var(--cream)" }}>
+      {/* Nav */}
+      <div style={{ background: "var(--dark)", padding: "28px 48px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 900, color: "var(--cream)", cursor: "pointer" }} onClick={onHome}>
+          Terra<span style={{ color: "var(--terra-light)" }}>.</span>
+        </div>
+        <button className="btn-ghost" onClick={onHome} style={{ fontSize: 12 }}>← Back to Home</button>
+      </div>
+
+      {/* Header */}
+      <div style={{ background: "var(--dark)", padding: "48px 48px 64px", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 60% 50%, rgba(122,54,40,0.4) 0%, transparent 70%)" }} />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "var(--terra-light)", fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ display: "inline-block", width: 24, height: 1, background: "var(--terra-light)" }} />
+            Growing Guides
+          </div>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 900, color: "var(--cream)", lineHeight: 1.1, marginBottom: 16 }}>
+            Zone-by-Zone<br /><em style={{ color: "var(--terra-light)", fontStyle: "italic" }}>Growing Guides</em>
+          </h1>
+          <p style={{ color: "rgba(245,234,224,0.6)", fontSize: 16, fontWeight: 300, maxWidth: 520 }}>
+            Every climate has its own rhythm. Select your zone below for specific planting windows, tips, and the crops that thrive where you live.
+          </p>
+        </div>
+      </div>
+
+      {/* Zone selector */}
+      <div style={{ background: "var(--warm-white)", borderBottom: "1px solid rgba(44,24,16,0.08)", padding: "0 48px", display: "flex", gap: 0, overflowX: "auto" }}>
+        {ZONE_GUIDES.map(z => (
+          <button key={z.id} onClick={() => setActiveZone(z.id)} style={{
+            background: "none", border: "none", cursor: "pointer",
+            padding: "20px 28px", fontSize: 13, fontWeight: activeZone === z.id ? 600 : 400,
+            color: activeZone === z.id ? "var(--terra-dark)" : "#888",
+            borderBottom: activeZone === z.id ? "2px solid var(--terra-dark)" : "2px solid transparent",
+            whiteSpace: "nowrap", transition: "all 0.15s",
+          }}>
+            {z.emoji} {z.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Guide content */}
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "56px 48px" }}>
+
+        {/* Zone header */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: z_color(guide.color), fontWeight: 600, marginBottom: 10 }}>{guide.zones} · {guide.examples}</div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 36, fontWeight: 900, color: "var(--dark)", marginBottom: 8 }}>{guide.emoji} {guide.label}</h2>
+          <p style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontStyle: "italic", color: "#888", marginBottom: 20 }}>{guide.tagline}</p>
+          <p style={{ fontSize: 15, color: "#444", lineHeight: 1.75, fontWeight: 300, maxWidth: 680 }}>{guide.intro}</p>
+        </div>
+
+        {/* Stats row */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2, marginBottom: 48 }}>
+          {[
+            { label: "Growing Season", value: guide.season },
+            { label: "Last Frost", value: guide.lastFrost },
+            { label: "First Fall Frost", value: guide.firstFrost },
+          ].map(s => (
+            <div key={s.label} style={{ background: "var(--warm-white)", padding: "20px 24px" }}>
+              <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--terra-dark)", fontWeight: 600, marginBottom: 6 }}>{s.label}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--dark)" }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Tips */}
+        <div style={{ marginBottom: 48 }}>
+          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: "var(--dark)", marginBottom: 20 }}>Key Tips for {guide.label}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {guide.tips.map((tip, i) => (
+              <div key={i} style={{ background: "var(--warm-white)", padding: "20px 24px", display: "flex", gap: 18, alignItems: "flex-start" }}>
+                <div style={{ width: 24, height: 24, borderRadius: "50%", background: guide.color, color: "#fff", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--dark)", marginBottom: 4 }}>{tip.title}</div>
+                  <div style={{ fontSize: 13, color: "#555", fontWeight: 300, lineHeight: 1.65 }}>{tip.body}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Seasonal rhythm */}
+        <div style={{ marginBottom: 48 }}>
+          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: "var(--dark)", marginBottom: 20 }}>Seasonal Rhythm</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {guide.rhythm.map((r, i) => (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "180px 1fr", gap: 24, padding: "16px 24px", background: i % 2 === 0 ? "var(--warm-white)" : "rgba(245,234,224,0.4)", alignItems: "start" }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: guide.color }}>{r.period}</div>
+                <div style={{ fontSize: 13, color: "#444", fontWeight: 300, lineHeight: 1.6 }}>{r.action}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Best plants */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: "var(--dark)", marginBottom: 16 }}>What Grows Best Here</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {guide.bestPlants.map(p => (
+              <span key={p} style={{ background: "rgba(122,54,40,0.08)", border: "1px solid rgba(122,54,40,0.15)", padding: "6px 14px", fontSize: 13, color: "var(--terra-dark)", fontWeight: 500 }}>{p}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* What to avoid */}
+        <div style={{ background: "rgba(196,98,45,0.06)", border: "1px solid rgba(196,98,45,0.18)", padding: "20px 24px" }}>
+          <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#C4622D", fontWeight: 600, marginBottom: 8 }}>What to Avoid</div>
+          <div style={{ fontSize: 13, color: "#555", fontWeight: 300, lineHeight: 1.65 }}>{guide.avoid}</div>
+        </div>
+
+        {/* CTA */}
+        <div style={{ marginTop: 56, textAlign: "center", padding: "40px", background: "var(--dark)", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 50%, rgba(122,54,40,0.4) 0%, transparent 70%)" }} />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: "var(--cream)", marginBottom: 8 }}>Ready to plan your {guide.label.toLowerCase()} garden?</div>
+            <p style={{ color: "rgba(245,234,224,0.6)", fontSize: 13, marginBottom: 24 }}>Get a personalized plant selection and planting calendar for your zone.</p>
+            <button className="btn-primary" onClick={onHome}>Plan My Garden →</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// tiny helper so JSX stays clean
+function z_color(hex: string) { return hex; }
+
 // ── Root App ─────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -951,7 +1287,8 @@ export default function App() {
   return (
     <>
       <style>{STYLES}</style>
-      {view === "home" && <HomePage onStart={() => setView("wizard")} />}
+      {view === "home" && <HomePage onStart={() => setView("wizard")} onGuides={() => setView("guides")} />}
+      {view === "guides" && <GuidesPage onHome={() => setView("home")} />}
       {view === "wizard" && (
         <WizardPage
           allPlants={allPlants}
