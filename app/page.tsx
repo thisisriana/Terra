@@ -252,10 +252,17 @@ interface TipEntry {
   sort_order: number;
 }
 
+interface SpaceRecommendation {
+  recommended: boolean;
+  notes: string;
+  recommended_container_size: string | null;
+}
+
 interface PlantDetail {
   slug: string;
   name: string;
   emoji: string;
+  category: string;
   tagline: string;
   difficulty: string;
   sun_requirement: string;
@@ -265,6 +272,13 @@ interface PlantDetail {
   ph_min: number;
   ph_max: number;
   drainage: string;
+  days_to_harvest_min: number | null;
+  days_to_harvest_max: number | null;
+  days_to_germinate_min: number | null;
+  container_friendly: boolean;
+  container_size_min_gallons: number | null;
+  container_depth_min_inches: number | null;
+  space_recommendation: SpaceRecommendation | null;
   plant_tips: TipEntry[];
   companion_planting: CompanionEntry[];
 }
@@ -417,6 +431,90 @@ function DiffBadge({ level }: { level: string }) {
   return level === "easy"
     ? <span className="badge badge-easy">Easy</span>
     : <span className="badge badge-moderate">Moderate</span>;
+}
+
+function HarvestTimeline({ plants, schedule }: { plants: PlantDetail[]; schedule: PlantSchedule[] }) {
+  const today = new Date();
+  const currentMonth = today.getMonth() + 1; // 1-based
+
+  const estimates = plants
+    .map(plant => {
+      const sched = schedule.find(s => s.slug === plant.slug);
+      let plantMonth: number | null = null;
+
+      if (sched?.outdoor_plant_months && sched.outdoor_plant_months.length > 0) {
+        const upcoming = sched.outdoor_plant_months.find(m => m >= currentMonth);
+        plantMonth = upcoming ?? sched.outdoor_plant_months[0];
+      }
+
+      if (!plant.days_to_harvest_min) return null;
+
+      const daysFromPlantToHarvest = plant.days_to_harvest_min + (plant.days_to_germinate_min ?? 0);
+
+      // plantDate = start of the next recommended outdoor planting window
+      const plantDate = new Date(today);
+      if (plantMonth !== null) {
+        const monthsUntilPlant = plantMonth >= currentMonth
+          ? plantMonth - currentMonth
+          : 12 - currentMonth + plantMonth;
+        plantDate.setMonth(plantDate.getMonth() + monthsUntilPlant);
+        plantDate.setDate(1); // start of that month
+      }
+
+      const harvestDate = new Date(plantDate);
+      harvestDate.setDate(harvestDate.getDate() + daysFromPlantToHarvest);
+
+      return {
+        slug: plant.slug,
+        name: plant.name,
+        emoji: plant.emoji,
+        plantDate,
+        harvestDate,
+        daysTotal: daysFromPlantToHarvest,
+        plantLabel: plantDate.toLocaleString("default", { month: "short" }),
+        harvestLabel: harvestDate.toLocaleString("default", { month: "long", year: "numeric" }),
+        hasSchedule: plantMonth !== null,
+      };
+    })
+    .filter((e): e is NonNullable<typeof e> => e !== null)
+    .sort((a, b) => a.harvestDate.getTime() - b.harvestDate.getTime());
+
+  if (estimates.length === 0) return null;
+
+  const maxDays = Math.max(...estimates.map(e => e.daysTotal));
+
+  return (
+    <div style={{ marginBottom: 48 }}>
+      <div className="section-header">
+        <div className="section-title">First Harvest Timeline</div>
+        <div className="section-count">If planted at the start of your next recommended outdoor window</div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {estimates.map(est => {
+          const barPct = Math.round((est.daysTotal / maxDays) * 100);
+          return (
+            <div key={est.slug} style={{ display: "grid", gridTemplateColumns: "180px 1fr 220px", gap: 16, alignItems: "center" }}>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, fontWeight: 700, color: "var(--dark)" }}>
+                {est.emoji} {est.name}
+              </div>
+              <div style={{ background: "rgba(196,98,45,0.1)", borderRadius: 4, height: 8, overflow: "hidden" }}>
+                <div style={{ width: `${barPct}%`, height: "100%", background: "var(--terra-light)", borderRadius: 4 }} />
+              </div>
+              <div style={{ fontSize: 12, color: "var(--terra-dark)", fontWeight: 500 }}>
+                {est.hasSchedule
+                  ? <>Plant <strong>{est.plantLabel}</strong> → harvest by <strong>{est.harvestLabel}</strong></>
+                  : <>~{est.daysTotal} days → <strong>{est.harvestLabel}</strong></>
+                }
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ fontSize: 11, color: "#aaa", marginTop: 12, fontWeight: 300 }}>
+        Dates assume outdoor planting at the start of the recommended window for your zone. Bar length = relative days to harvest.
+      </div>
+    </div>
+  );
 }
 
 function PlantRow({ plant }: { plant: PlantDetail }) {
@@ -747,6 +845,8 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
   const [aiInsight, setAiInsight] = useState("");
   const [plantDetails, setPlantDetails] = useState<PlantDetail[]>([]);
   const [schedule, setSchedule] = useState<PlantSchedule[]>([]);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -755,17 +855,26 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           fetch("/api/plants/details", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ slugs: answers.plants }),
+            body: JSON.stringify({ slugs: answers.plants, space: answers.space }),
           }),
           fetch("/api/garden-insight", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              prompt: answers.experience === "new"
-                ? `A complete beginner gardener with a ${getSpaceLabel(answers.space).toLowerCase()} is starting their first garden with: ${answers.plants.join(", ")}. Write 2-3 sentences of warm, encouraging advice tailored to a first-timer. Focus on: one simple thing to start with, what to watch for as a beginner, and a reassuring note that they can do this. Be specific to 1-2 of their plants. No markdown, no bullet points, pure prose.`
-                : answers.experience === "some"
-                ? `A gardener with a few seasons of experience has a ${getSpaceLabel(answers.space).toLowerCase()} and wants to grow: ${answers.plants.join(", ")}. Write 2-3 sentences of practical, intermediate-level advice. Focus on: how to get better results than last season, an optimization tip specific to their plant mix, and what to pay attention to this time around. Mention 1-2 of their specific plants. No markdown, no bullet points, pure prose.`
-                : `An experienced, confident gardener with a ${getSpaceLabel(answers.space).toLowerCase()} is planning to grow: ${answers.plants.join(", ")}. Write 2-3 sentences of concise, advanced gardening insight. Focus on: maximizing yield or aesthetics, a nuanced technique for their plant combination, or a pro-level consideration for their space. Skip the basics — they know them. Mention 1-2 of their plants specifically. No markdown, no bullet points, pure prose.`,
+              prompt: (() => {
+                const goalCtx = answers.goals.length > 0
+                  ? ` Their goals are: ${answers.goals.map(g => GOAL_OPTIONS.find(o => o.id === g)?.title ?? g).join(", ")}.`
+                  : "";
+                const plants = answers.plants.join(", ");
+                const space = getSpaceLabel(answers.space).toLowerCase();
+                if (answers.experience === "new") {
+                  return `A complete beginner gardener with a ${space} is starting their first garden with: ${plants}.${goalCtx} Write 2-3 sentences of warm, encouraging advice tailored to a first-timer. Weave in their goals naturally. Focus on: one simple thing to start with, what to watch for as a beginner, and a reassuring note that they can do this. Be specific to 1-2 of their plants. No markdown, no bullet points, pure prose.`;
+                } else if (answers.experience === "some") {
+                  return `A gardener with a few seasons of experience has a ${space} and wants to grow: ${plants}.${goalCtx} Write 2-3 sentences of practical, intermediate-level advice that connects to their goals. Focus on: how to get better results than last season, an optimization tip specific to their plant mix and goals, and what to pay attention to this time around. Mention 1-2 of their specific plants. No markdown, no bullet points, pure prose.`;
+                } else {
+                  return `An experienced, confident gardener with a ${space} is planning to grow: ${plants}.${goalCtx} Write 2-3 sentences of concise, advanced gardening insight aligned to their goals. Focus on: maximizing yield or aesthetics, a nuanced technique for their plant combination, or a pro-level consideration for their space and goals. Skip the basics — they know them. Mention 1-2 of their plants specifically. No markdown, no bullet points, pure prose.`;
+                }
+              })(),
             }),
           }),
           fetch("/api/plants/schedule", {
@@ -839,19 +948,60 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
   });
   const compatibleGroups = Object.values(groupMap).filter(g => g.length >= 2);
 
-  // Sort plants by difficulty for beginners (easy first), keep original order otherwise
-  const sortedPlants = answers.experience === "new"
-    ? [...plantDetails].sort((a, b) => {
-        if (a.difficulty === b.difficulty) return 0;
-        return a.difficulty === "easy" ? -1 : 1;
-      })
-    : plantDetails;
+  // Goal-aware sorting: each goal shapes what rises to the top
+  const goalSort = (a: PlantDetail, b: PlantDetail): number => {
+    if (answers.goals.includes("eat")) {
+      const aD = a.days_to_harvest_min ?? 9999;
+      const bD = b.days_to_harvest_min ?? 9999;
+      if (aD !== bD) return aD - bD;
+    }
+    if (answers.goals.includes("beauty")) {
+      const order = ["flower", "herb"];
+      const aR = order.indexOf(a.category);
+      const bR = order.indexOf(b.category);
+      if (aR !== bR) return (aR === -1 ? 99 : aR) - (bR === -1 ? 99 : bR);
+    }
+    if (answers.goals.includes("wellness")) {
+      const aH = a.category === "herb" ? 0 : 1;
+      const bH = b.category === "herb" ? 0 : 1;
+      if (aH !== bH) return aH - bH;
+    }
+    // Beginners always get easy plants first as a baseline
+    if (answers.experience === "new") {
+      if (a.difficulty !== b.difficulty) return a.difficulty === "easy" ? -1 : 1;
+    }
+    return 0;
+  };
+  const sortedPlants = [...plantDetails].sort(goalSort);
 
-  const moderatePlantsForBeginner = answers.experience === "new"
-    ? plantDetails.filter(p => p.difficulty === "moderate").map(p => p.name)
-    : [];
+  // Challenge framing: for "learn" goal, moderate plants are badges of honor not warnings
+  const isLearnGoal = answers.goals.includes("learn");
+  const moderatePlants = plantDetails.filter(p => p.difficulty === "moderate").map(p => p.name);
+  const moderatePlantsForBeginner = answers.experience === "new" && !isLearnGoal ? moderatePlants : [];
+  const challengePicks = isLearnGoal && moderatePlants.length > 0 ? moderatePlants : [];
+
+  // Feature 3: Proactive companion suggestions — find beneficial companions NOT in selection
+  const companionSuggestions: { slug: string; name: string; benefitedPlants: string[] }[] = [];
+  const suggestionMap: Record<string, { name: string; benefitedPlants: string[] }> = {};
+  plantDetails.forEach(plant => {
+    plant.companion_planting.forEach(c => {
+      if (!c.companion || selectedSlugs.has(c.companion.slug)) return;
+      if (c.relationship !== "beneficial") return;
+      if (!suggestionMap[c.companion.slug]) {
+        suggestionMap[c.companion.slug] = { name: c.companion.name, benefitedPlants: [] };
+      }
+      if (!suggestionMap[c.companion.slug].benefitedPlants.includes(plant.name)) {
+        suggestionMap[c.companion.slug].benefitedPlants.push(plant.name);
+      }
+    });
+  });
+  Object.entries(suggestionMap)
+    .sort((a, b) => b[1].benefitedPlants.length - a[1].benefitedPlants.length)
+    .slice(0, 3)
+    .forEach(([slug, data]) => companionSuggestions.push({ slug, ...data }));
 
   return (
+    <>
     <div className="results-page">
       <div className="results-hero">
         <div className="results-hero-bg" />
@@ -859,7 +1009,10 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 900, color: "var(--cream)", cursor: "pointer" }} onClick={onRestart}>
             Terra<span style={{ color: "var(--terra-light)" }}>.</span>
           </div>
-          <button className="btn-ghost" onClick={onRestart} style={{ fontSize: 12 }}>← Start Over</button>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="btn-ghost" onClick={() => setShareOpen(true)} style={{ fontSize: 12 }}>Share →</button>
+            <button className="btn-ghost" onClick={onRestart} style={{ fontSize: 12 }}>← Start Over</button>
+          </div>
         </div>
         <div>
           <div className="results-eyebrow">Your Personal Garden Guide</div>
@@ -908,6 +1061,25 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           </div>
         </div>
 
+        {/* Feature 1: Goal-aware callout */}
+        {answers.goals.length > 0 && (
+          <div style={{ background: "rgba(196,98,45,0.06)", border: "1px solid rgba(196,98,45,0.15)", padding: "16px 22px", marginBottom: 24, display: "flex", gap: 12, alignItems: "flex-start" }}>
+            <span style={{ fontSize: 16, flexShrink: 0 }}>✦</span>
+            <div style={{ fontSize: 13, color: "#555", fontWeight: 300, lineHeight: 1.6 }}>
+              <strong style={{ color: "var(--dark)", fontWeight: 600 }}>Personalized for your goals — </strong>
+              {answers.goals.includes("eat") && "plants sorted by fastest harvest first. "}
+              {answers.goals.includes("beauty") && "flowers and ornamental plants highlighted first. "}
+              {answers.goals.includes("wellness") && "herbs and sensory plants prioritized. "}
+              {answers.goals.includes("learn") && "moderate-difficulty plants marked as Challenge Picks. "}
+              {answers.goals.includes("eat") && "Pick the quickest producers to get food on your table fast."}
+              {answers.goals.includes("beauty") && "These selections will give you the most visual impact."}
+              {answers.goals.includes("wellness") && "These are your most fragrant, tactile, and calming plants."}
+              {answers.goals.includes("learn") && "Push yourself — the harder plants are where the real learning happens."}
+            </div>
+          </div>
+        )}
+
+        {/* Feature 1: Beginner warning (only if not "learn" goal) */}
         {moderatePlantsForBeginner.length > 0 && (
           <div style={{ background: "rgba(212,168,67,0.1)", border: "1px solid rgba(212,168,67,0.35)", padding: "18px 24px", marginBottom: 32, display: "flex", gap: 14, alignItems: "flex-start" }}>
             <span style={{ fontSize: 18, flexShrink: 0 }}>★</span>
@@ -920,13 +1092,29 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           </div>
         )}
 
+        {/* Feature 1: Challenge picks callout (for "learn" goal) */}
+        {challengePicks.length > 0 && (
+          <div style={{ background: "rgba(122,54,40,0.06)", border: "1px solid rgba(122,54,40,0.2)", padding: "18px 24px", marginBottom: 32, display: "flex", gap: 14, alignItems: "flex-start" }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>◆</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--dark)", marginBottom: 4 }}>Challenge Picks in your selection</div>
+              <div style={{ fontSize: 13, color: "#555", fontWeight: 300, lineHeight: 1.6 }}>
+                <strong>{challengePicks.join(" and ")}</strong> {challengePicks.length === 1 ? "is" : "are"} moderate difficulty — exactly the kind of plant to sharpen your skills on. Read each guide carefully and you&apos;ll come away a much better gardener.
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Feature 2: Harvest timeline */}
+        <HarvestTimeline plants={plantDetails} schedule={schedule} />
+
         {schedule.length > 0 && <PlantingCalendar schedule={schedule} />}
 
         <div className="section-header">
           <div className="section-title">Plant-by-Plant Guide</div>
           <div className="section-count">{plantDetails.length} plants — click to expand</div>
         </div>
-        {answers.experience === "new" && (
+        {answers.experience === "new" && !isLearnGoal && (
           <div style={{ fontSize: 13, color: "#888", marginBottom: 20, fontWeight: 300 }}>
             New to gardening? Start with the easy-rated plants and get comfortable before tackling anything more involved.
           </div>
@@ -939,6 +1127,26 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
         <div className="plants-list">
           {sortedPlants.map(p => <PlantRow key={p.slug} plant={p} />)}
         </div>
+
+        {/* Feature 3: Proactive companion suggestions */}
+        {companionSuggestions.length > 0 && (
+          <div style={{ background: "rgba(90,140,90,0.06)", border: "1px solid rgba(90,140,90,0.2)", padding: "24px 28px", marginBottom: 48 }}>
+            <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#5A8C5A", fontWeight: 600, marginBottom: 14 }}>✦ Consider Adding</div>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: "var(--dark)", marginBottom: 6 }}>Plants that would strengthen your garden</div>
+            <div style={{ fontSize: 13, color: "#777", fontWeight: 300, marginBottom: 20 }}>Based on your current selection, these plants would create beneficial relationships with what you&apos;re already growing.</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {companionSuggestions.map(s => (
+                <div key={s.slug} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#5A8C5A", marginTop: 6, flexShrink: 0 }} />
+                  <div>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "var(--dark)" }}>{s.name}</span>
+                    <span style={{ fontSize: 13, color: "#777", fontWeight: 300 }}> — benefits {s.benefitedPlants.join(", ")} already in your plan</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {(compatibleGroups.length > 0 || harmfulPairs.length > 0) && (
           <div className="companions-section">
@@ -1002,12 +1210,125 @@ function ResultsPage({ answers, onRestart }: { answers: Answers; onRestart: () =
           </div>
         </div>
 
+        {/* Feature 4: Space Guide */}
+        {plantDetails.some(p => p.space_recommendation) && (
+          <div style={{ background: "var(--cream)", padding: "48px", marginBottom: 64, borderLeft: "3px solid var(--gold)" }}>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "var(--dark)", marginBottom: 8 }}>Space Guide</div>
+            <p style={{ color: "#999", fontSize: 13, marginBottom: 32, fontWeight: 300 }}>How to fit each plant in your {getSpaceLabel(answers.space).toLowerCase()}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {plantDetails.map(plant => {
+                const rec = plant.space_recommendation;
+                return (
+                  <div key={plant.slug} style={{ background: "var(--warm-white)", padding: "20px 28px", display: "grid", gridTemplateColumns: "200px 1fr 160px", gap: 24, alignItems: "start" }}>
+                    <div>
+                      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, fontWeight: 700, color: "var(--dark)" }}>{plant.emoji} {plant.name}</div>
+                      {!rec?.recommended && rec && (
+                        <div style={{ fontSize: 11, color: "#C4622D", fontWeight: 500, marginTop: 4 }}>⚠ Challenging for this space</div>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 13, color: "#555", lineHeight: 1.6, fontWeight: 300 }}>
+                      {rec?.notes ?? (plant.container_friendly ? "Container friendly — adapts well to this space." : "Prefers ground planting.")}
+                    </div>
+                    <div>
+                      {rec?.recommended_container_size ? (
+                        <>
+                          <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--terra-dark)", fontWeight: 600, marginBottom: 4 }}>Container Size</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--dark)" }}>{rec.recommended_container_size}</div>
+                        </>
+                      ) : plant.container_size_min_gallons ? (
+                        <>
+                          <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--terra-dark)", fontWeight: 600, marginBottom: 4 }}>Min Container</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--dark)" }}>{plant.container_size_min_gallons} gal{plant.container_depth_min_inches ? `, ${plant.container_depth_min_inches}" deep` : ""}</div>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="start-over">
           <p>Want to plan a different garden or try new plants?</p>
           <button className="btn-next" onClick={onRestart}>Plan Another Garden →</button>
         </div>
       </div>
     </div>
+
+    {/* Feature 5: Share modal */}
+    {shareOpen && (
+      <div style={{ position: "fixed", inset: 0, background: "rgba(28,16,8,0.75)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }} onClick={() => setShareOpen(false)}>
+        <div style={{ background: "var(--dark)", borderRadius: 4, padding: 40, maxWidth: 520, width: "100%", position: "relative" }} onClick={e => e.stopPropagation()}>
+          {/* Card content */}
+          <div style={{ borderBottom: "1px solid rgba(212,135,106,0.2)", paddingBottom: 24, marginBottom: 24 }}>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: "var(--terra-light)", letterSpacing: 3, textTransform: "uppercase", marginBottom: 16 }}>Terra Garden Plan</div>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 700, color: "var(--cream)", lineHeight: 1.2, marginBottom: 20 }}>
+              <em>{plantDetails.length} plants</em> for my {getSpaceLabel(answers.space)}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 24 }}>
+              {[
+                getSpaceLabel(answers.space),
+                answers.experience === "new" ? "Beginner" : answers.experience === "some" ? "Intermediate" : "Experienced",
+                answers.zone ? getZoneLabel(answers.zone) : null,
+                ...answers.goals.map(g => GOAL_OPTIONS.find(o => o.id === g)?.title ?? g),
+              ].filter(Boolean).map((label, i) => (
+                <span key={i} style={{ fontSize: 11, padding: "3px 10px", border: "1px solid rgba(212,135,106,0.3)", color: "var(--terra-light)", borderRadius: 20 }}>{label}</span>
+              ))}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              {plantDetails.map(p => (
+                <div key={p.slug} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <span style={{ fontSize: 28 }}>{p.emoji}</span>
+                  <span style={{ fontSize: 10, color: "rgba(245,234,224,0.6)", fontWeight: 300 }}>{p.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <button
+              className="btn-primary"
+              style={{ fontSize: 13, flex: 1 }}
+              onClick={() => {
+                const text = [
+                  `🌱 My Terra Garden Plan`,
+                  `${plantDetails.length} plants for my ${getSpaceLabel(answers.space)}`,
+                  `Zone: ${getZoneLabel(answers.zone)}`,
+                  ``,
+                  plantDetails.map(p => `${p.emoji} ${p.name}`).join("  ·  "),
+                  ``,
+                  `Plan yours at terra.app`,
+                ].join("\n");
+                navigator.clipboard.writeText(text).then(() => {
+                  setShareCopied(true);
+                  setTimeout(() => setShareCopied(false), 2000);
+                });
+              }}
+            >
+              {shareCopied ? "Copied!" : "Copy to Clipboard"}
+            </button>
+            {typeof navigator !== "undefined" && "share" in navigator && (
+              <button
+                className="btn-ghost"
+                style={{ fontSize: 13, flex: 1 }}
+                onClick={() => {
+                  navigator.share({
+                    title: "My Terra Garden Plan",
+                    text: `${plantDetails.length} plants for my ${getSpaceLabel(answers.space)}: ${plantDetails.map(p => p.name).join(", ")}`,
+                  });
+                }}
+              >
+                Share via…
+              </button>
+            )}
+            <button className="btn-ghost" style={{ fontSize: 13 }} onClick={() => setShareOpen(false)}>Close</button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 
