@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap');
@@ -439,41 +439,47 @@ function HarvestTimeline({ plants, schedule }: { plants: PlantDetail[]; schedule
 
   const estimates = plants
     .map(plant => {
-      const sched = schedule.find(s => s.slug === plant.slug);
-      let plantMonth: number | null = null;
-
-      if (sched?.outdoor_plant_months && sched.outdoor_plant_months.length > 0) {
-        const upcoming = sched.outdoor_plant_months.find(m => m >= currentMonth);
-        plantMonth = upcoming ?? sched.outdoor_plant_months[0];
-      }
-
       if (!plant.days_to_harvest_min) return null;
 
-      const daysFromPlantToHarvest = plant.days_to_harvest_min + (plant.days_to_germinate_min ?? 0);
+      const sched = schedule.find(s => s.slug === plant.slug);
+      const indoorMonths = sched?.indoor_start_months ?? [];
+      const outdoorMonths = sched?.outdoor_plant_months ?? [];
 
-      // plantDate = start of the next recommended outdoor planting window
-      const plantDate = new Date(today);
-      if (plantMonth !== null) {
-        const monthsUntilPlant = plantMonth >= currentMonth
-          ? plantMonth - currentMonth
-          : 12 - currentMonth + plantMonth;
-        plantDate.setMonth(plantDate.getMonth() + monthsUntilPlant);
-        plantDate.setDate(1); // start of that month
+      // Pick the soonest available sow window (indoor or outdoor), measured in months from today
+      function monthsUntil(m: number) {
+        return m >= currentMonth ? m - currentMonth : 12 - currentMonth + m;
+      }
+      type Candidate = { month: number; indoor: boolean; dist: number };
+      const candidates: Candidate[] = [
+        ...indoorMonths.map(m => ({ month: m, indoor: true,  dist: monthsUntil(m) })),
+        ...outdoorMonths.map(m => ({ month: m, indoor: false, dist: monthsUntil(m) })),
+      ];
+      if (candidates.length === 0) return null;
+      candidates.sort((a, b) => a.dist - b.dist);
+      const { indoor: indoorStart, dist: monthsAway } = candidates[0];
+
+      // Sow date: today if we're already in the window, otherwise start of that future month
+      const sowDate = new Date(today);
+      if (monthsAway > 0) {
+        sowDate.setMonth(sowDate.getMonth() + monthsAway);
+        sowDate.setDate(1);
       }
 
-      const harvestDate = new Date(plantDate);
-      harvestDate.setDate(harvestDate.getDate() + daysFromPlantToHarvest);
+      // Harvest date = sow date + germination + grow time (calculation-based, not from harvest_months window)
+      const daysTotal = (plant.days_to_germinate_min ?? 0) + plant.days_to_harvest_min;
+      const harvestDate = new Date(sowDate);
+      harvestDate.setDate(harvestDate.getDate() + daysTotal);
 
       return {
         slug: plant.slug,
         name: plant.name,
         emoji: plant.emoji,
-        plantDate,
+        sowDate,
         harvestDate,
-        daysTotal: daysFromPlantToHarvest,
-        plantLabel: plantDate.toLocaleString("default", { month: "short" }),
+        daysTotal,
+        sowLabel: sowDate.toLocaleString("default", { month: "short" }),
         harvestLabel: harvestDate.toLocaleString("default", { month: "long", year: "numeric" }),
-        hasSchedule: plantMonth !== null,
+        indoorStart,
       };
     })
     .filter((e): e is NonNullable<typeof e> => e !== null)
@@ -487,7 +493,7 @@ function HarvestTimeline({ plants, schedule }: { plants: PlantDetail[]; schedule
     <div style={{ marginBottom: 48 }}>
       <div className="section-header">
         <div className="section-title">First Harvest Timeline</div>
-        <div className="section-count">If planted at the start of your next recommended outdoor window</div>
+        <div className="section-count">Based on sowing seeds at the start of your next recommended window</div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {estimates.map(est => {
@@ -501,9 +507,9 @@ function HarvestTimeline({ plants, schedule }: { plants: PlantDetail[]; schedule
                 <div style={{ width: `${barPct}%`, height: "100%", background: "var(--terra-light)", borderRadius: 4 }} />
               </div>
               <div style={{ fontSize: 12, color: "var(--terra-dark)", fontWeight: 500 }}>
-                {est.hasSchedule
-                  ? <>Plant <strong>{est.plantLabel}</strong> → harvest by <strong>{est.harvestLabel}</strong></>
-                  : <>~{est.daysTotal} days → <strong>{est.harvestLabel}</strong></>
+                {est.indoorStart
+                  ? <>Sow indoors <strong>{est.sowLabel}</strong> → harvest by <strong>{est.harvestLabel}</strong></>
+                  : <>Sow <strong>{est.sowLabel}</strong> → harvest by <strong>{est.harvestLabel}</strong></>
                 }
               </div>
             </div>
@@ -511,7 +517,7 @@ function HarvestTimeline({ plants, schedule }: { plants: PlantDetail[]; schedule
         })}
       </div>
       <div style={{ fontSize: 11, color: "#aaa", marginTop: 12, fontWeight: 300 }}>
-        Dates assume outdoor planting at the start of the recommended window for your zone. Bar length = relative days to harvest.
+        Sow dates based on your zone. Bar length = relative time to first harvest.
       </div>
     </div>
   );
@@ -649,6 +655,7 @@ function WizardPage({
   const [answers, setAnswers] = useState<Answers>({ space: null, experience: null, zone: null, plants: [], goals: [] });
   const [plantSearch, setPlantSearch] = useState("");
   const [plantDropdownOpen, setPlantDropdownOpen] = useState(false);
+  const plantInputRef = useRef<HTMLInputElement>(null);
 
   function canProceed() {
     if (step === 0) return !!answers.space;
@@ -771,6 +778,7 @@ function WizardPage({
             <div className="plant-search-wrapper">
               <div className="plant-search-box">
                 <input
+                  ref={plantInputRef}
                   className="plant-search-input"
                   type="text"
                   placeholder="Search plants..."
@@ -778,6 +786,20 @@ function WizardPage({
                   onChange={e => { setPlantSearch(e.target.value); setPlantDropdownOpen(true); }}
                   onFocus={() => setPlantDropdownOpen(true)}
                   onBlur={() => setTimeout(() => setPlantDropdownOpen(false), 150)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      const match = allPlants.find(p =>
+                        p.name.toLowerCase().includes(plantSearch.toLowerCase()) &&
+                        !answers.plants.includes(p.slug)
+                      );
+                      if (match) {
+                        togglePlant(match.slug);
+                        setPlantSearch("");
+                        setPlantDropdownOpen(true);
+                      }
+                      e.preventDefault();
+                    }
+                  }}
                   autoComplete="off"
                 />
                 {plantDropdownOpen && (
@@ -785,7 +807,7 @@ function WizardPage({
                     {allPlants
                       .filter(p => p.name.toLowerCase().includes(plantSearch.toLowerCase()) && !answers.plants.includes(p.slug))
                       .map(p => (
-                        <div key={p.slug} className="plant-dropdown-item" onMouseDown={() => { togglePlant(p.slug); setPlantSearch(""); }}>
+                        <div key={p.slug} className="plant-dropdown-item" onMouseDown={() => { togglePlant(p.slug); setPlantSearch(""); setTimeout(() => plantInputRef.current?.focus(), 0); }}>
                           {p.name}
                         </div>
                       ))}
